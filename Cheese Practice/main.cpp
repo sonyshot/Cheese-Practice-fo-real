@@ -1,12 +1,12 @@
 #include <SFML/Graphics.hpp>
-#include "board and pieces.cpp"
+#include "board.h"
+#include "real pieces.h"
 
 //copy pasta'd window loop from sfml website
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-	sf::CircleShape shape(100.f);
-	shape.setFillColor(sf::Color::Green);
+	sf::RenderWindow window(sf::VideoMode(800, 800), "board drawing test");
+	Board board(400);
 
 	while (window.isOpen())
 	{
@@ -18,7 +18,7 @@ int main()
 		};
 
 		window.clear();
-		window.draw(shape);
+		window.draw(board);
 		window.display();
 	};
 

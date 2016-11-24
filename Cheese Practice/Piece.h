@@ -5,7 +5,7 @@
 
 class Board;
 
-class Piece {
+class Piece: public sf::Drawable {
 protected:
 	std::array<int, 2> m_position;
 	int m_color;
@@ -22,5 +22,7 @@ public:
 	int getColor();
 
 	virtual bool legalMove(Board board, std::array<int, 2> move);
+
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates state);
 };
 

@@ -5,7 +5,25 @@
 #include "real pieces.h"
 
 
-Board::Board() {
+Board::Board(int size) {
+	//size should be a multiple of 8, not sure how it will draw otherwise
+	sf::Image blackSquare;
+	blackSquare.create(size/8, size/8, sf::Color::Black);
+	sf::Image whiteSquare;
+	whiteSquare.create(size/8, size/8, sf::Color::White);
+
+	m_texture.create(size, size);
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if ((i + j) % 2 == 0)
+				m_texture.update(whiteSquare, i*size / 8, j*size / 8);
+			else
+				m_texture.update(blackSquare, i*size / 8, j*size / 8);
+		};
+	};
+
+	m_sprite.setTexture(m_texture);
+
 	for (int i = 0; i < 8; i++) {//create pawns on the board
 		m_squares[8 + i] = new Pawn(i, 1, 1);
 		m_squares[48 + i] = new Pawn(i, 6, -1);
@@ -36,7 +54,25 @@ Board::Board() {
 		m_squares[16 + i] = new EmptySquare(i % 8, 2 + i / 8, 0);
 	};
 };
-Board::Board(std::array<Piece*, 64> squares, std::array<int, 2> whiteKingPos, std::array<int, 2> blackKingPos) {
+Board::Board(int size, std::array<Piece*, 64> squares, std::array<int, 2> whiteKingPos, std::array<int, 2> blackKingPos) {
+	//size should be a multiple of 8, not sure how it will draw otherwise
+	sf::Image blackSquare;
+	blackSquare.create(size / 8, size / 8, sf::Color::Black);
+	sf::Image whiteSquare;
+	whiteSquare.create(size / 8, size / 8, sf::Color::White);
+
+	m_texture.create(size, size);
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if ((i + j) % 2 == 0)
+				m_texture.update(whiteSquare, i*size / 8, j*size / 8);
+			else
+				m_texture.update(blackSquare, i*size / 8, j*size / 8);
+		};
+	};
+
+	m_sprite.setTexture(m_texture);
+
 	m_squares.swap(squares);
 	m_whiteKingPos = whiteKingPos;
 	m_blackKingPos = blackKingPos;
@@ -48,7 +84,11 @@ Board::~Board() {
 	};
 };
 
-//this needs to be redone/actually done
+//create white and black square images
+//map them appropriately to a texture
+//send texture to sprite
+//-------maybe put above in constructor? no need to create a texture every time this is drawn--------
+//draw sprite lel
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 };

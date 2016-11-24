@@ -1,7 +1,7 @@
 #pragma once
 #include "Piece.h"
 
-class Pawn : public Piece, public sf::Drawable {
+class Pawn : public Piece{
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
@@ -14,7 +14,7 @@ public:
 	//see above
 };
 
-class Knight : public Piece, public sf::Drawable {
+class Knight : public Piece{
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
@@ -27,7 +27,7 @@ public:
 	//see above
 };
 
-class Bishop : public Piece, public sf::Drawable {
+class Bishop : public Piece {
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
@@ -40,7 +40,7 @@ public:
 	//see above
 };
 
-class Rook : public Piece, public sf::Drawable {
+class Rook : public Piece{
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
@@ -53,7 +53,7 @@ public:
 	//see above
 };
 
-class Queen : public Piece, public sf::Drawable {
+class Queen : public Piece {
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
@@ -66,7 +66,7 @@ public:
 	//see above
 };
 
-class King : public Piece, public sf::Drawable {
+class King : public Piece {
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
@@ -79,7 +79,7 @@ public:
 	//see above
 };
 
-class EmptySquare : public Piece, public sf::Drawable {
+class EmptySquare : public Piece{
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
