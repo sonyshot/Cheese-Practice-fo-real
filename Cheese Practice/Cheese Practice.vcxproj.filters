@@ -18,10 +18,13 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Board and Pieces.cpp">
+    <ClCompile Include="Piece.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Piece.cpp">
+    <ClCompile Include="real pieces.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -30,6 +33,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Piece.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="real pieces.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
