@@ -120,6 +120,7 @@
   <ItemGroup>
     <ClCompile Include="Board and Pieces.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Piece.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
