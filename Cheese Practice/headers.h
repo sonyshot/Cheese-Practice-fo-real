@@ -5,7 +5,7 @@
 
 class Board: public sf::Drawable{
 	sf::Sprite m_sprite;
-	Piece *m_squares[64];
+	std::array<Piece*, 64> m_squares = {};
 	std::array<int, 2> m_whiteKingPos;
 	std::array<int, 2> m_blackKingPos;
 public:
@@ -26,7 +26,7 @@ public:
 
 
 
-	Piece* inSpace(std::array<int, 2> position) {
+	Piece * inSpace(std::array<int, 2> position) {
 		
 	};
 };

@@ -1,5 +1,5 @@
 #include <SFML/Graphics.hpp>
-
+#include "board and pieces.cpp"
 
 //copy pasta'd window loop from sfml website
 int main()
