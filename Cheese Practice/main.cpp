@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "board.h"
+#include "Piece.h"
 #include "real pieces.h"
 
 //copy pasta'd window loop from sfml website
