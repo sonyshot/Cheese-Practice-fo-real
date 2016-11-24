@@ -26,7 +26,7 @@ bool Pawn::legalMove(Board board, std::array<int, 2> move) {
 };
 
 	//this needs to be redone/actually done
-void Pawn::draw(sf::RenderTarget& target, sf::RenderStates states) {
+void Pawn::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 };
 	//see above
@@ -47,6 +47,7 @@ bool Knight::legalMove(Board board, std::array<int, 2> move) {
 	//this needs to be redone/actually done
 void Knight::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
+	std::cout << "plz work" << std::endl;
 };
 	//see above
 

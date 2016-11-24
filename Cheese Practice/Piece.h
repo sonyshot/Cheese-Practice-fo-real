@@ -23,6 +23,6 @@ public:
 
 	virtual bool legalMove(Board board, std::array<int, 2> move) = 0;
 
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) = 0;
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 };
 
