@@ -10,6 +10,7 @@ protected:
 	std::array<int, 2> m_position;
 	int m_color;
 	sf::Sprite m_sprite;
+	float m_size;
 public:
 	Piece();
 
@@ -23,7 +24,7 @@ public:
 
 	int getColor();
 
-	virtual bool legalMove(Board board, std::array<int, 2> move) = 0;
+	virtual bool legalMove(Board * board, std::array<int, 2> move) = 0;
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 };

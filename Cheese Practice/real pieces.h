@@ -7,7 +7,7 @@ class Pawn : public Piece{
 public:
 	using Piece::Piece;
 
-	bool legalMove(Board board, std::array<int, 2> move);
+	bool legalMove(Board * board, std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -20,7 +20,7 @@ class Knight : public Piece{
 public:
 	using Piece::Piece;
 
-	bool legalMove(Board board, std::array<int, 2> move);
+	bool legalMove(Board * board, std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -33,7 +33,7 @@ class Bishop : public Piece {
 public:
 	using Piece::Piece;
 
-	bool legalMove(Board board, std::array<int, 2> move);
+	bool legalMove(Board * board, std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -46,7 +46,7 @@ class Rook : public Piece{
 public:
 	using Piece::Piece;
 
-	bool legalMove(Board board, std::array<int, 2> move);
+	bool legalMove(Board * board, std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -59,7 +59,7 @@ class Queen : public Piece {
 public:
 	using Piece::Piece;
 
-	bool legalMove(Board board, std::array<int, 2> move);
+	bool legalMove(Board * board, std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -72,7 +72,7 @@ class King : public Piece {
 public:
 	using Piece::Piece;
 
-	bool legalMove(Board board, std::array<int, 2> move);
+	bool legalMove(Board * board, std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -89,7 +89,7 @@ public:
 
 	EmptySquare(int size, int file, int rank, int color, const sf::Texture * texture);
 
-	bool legalMove(Board board, std::array<int, 2> move);
+	bool legalMove(Board * board, std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;

@@ -47,6 +47,7 @@ Board::Board(int size) {
 		//rooks
 		m_squares[7 * i] = new Rook(100, 7 * i, 0, 1, m_rookTexture);
 		m_squares[56 + 7 * i] = new Rook(100, 7 * i, 7, -1, m_rookTexture);
+		std::cout << "black rook " << i << " created at (" << (7*i) << ", " << 7 << ")" << std::endl;
 	};
 	if (!queenTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\queen.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
@@ -92,7 +93,7 @@ Board::Board(int size, std::array<Piece*, 64> squares, std::array<int, 2> whiteK
 }
 //need destructor defined to clear out objects on heap
 Board::~Board() {
-	for (int i = 0; i < 63; i++) {
+	for (int i = 0; i < 64; i++) {
 		delete m_squares[i];
 	};
 };
@@ -104,21 +105,22 @@ Board::~Board() {
 //draw sprite lel
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
-	for (int i = 0; i < 63; i++) {
+	for (int i = 0; i < 64; i++) {
 		target.draw(*m_squares[i], states);
 	};
 };
 //see above
 
 bool Board::checkCheck(Piece * piece) {
-	return piece->legalMove(*this, !(piece->getColor() + 1) ? m_whiteKingPos : m_blackKingPos);
+	return piece->legalMove(this, !(piece->getColor() + 1) ? m_whiteKingPos : m_blackKingPos);
 };
 
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	Piece * ppiece = inSpace(currentPos);
-	if (ppiece->legalMove(*this, newPos)) {
-
-		m_movelist.push_back({ currentPos, newPos });
+	if (ppiece->legalMove(this, newPos)) {
+		//for some reason, as soon as this legalMove returns a value, it breaks all the textures in board's array
+		//i'll try changing it to take board pointers instead of board objects
+		//m_movelist.push_back({ currentPos, newPos });
 		ppiece->move(newPos);
 		delete m_squares[newPos[0] + 8 * newPos[1]];
 		m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
