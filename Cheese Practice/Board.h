@@ -26,6 +26,7 @@ class Board : public sf::Drawable {
 	std::array<int, 2> m_whiteKingPos;
 	std::array<int, 2> m_blackKingPos;
 	std::vector<std::array<std::array<int, 2>, 2>> m_movelist;
+	int turn = 1;
 public:
 	//constructor(s) here?
 	//this uses 'new' to create piece objects that wont get deleted outside the constructor necessitating 'delete' in the destructor

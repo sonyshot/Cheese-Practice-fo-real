@@ -23,18 +23,18 @@ Board::Board(int size) {
 
 	m_sprite.setTexture(m_boardTexture);
 
-	if (!pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\pawn.png"))
+	if (!pawnTexture.loadFromFile("pawn.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
 	for (int i = 0; i < 8; i++) {//create pawns on the board
 		m_squares[8 + i] = new Pawn(100, i, 1, 1, m_pawnTexture);
 		std::cout << "white pawn " << i << " created at (" << i << ", " << 1 << ")" << std::endl;
 		m_squares[48 + i] = new Pawn(100, i, 6, -1, m_pawnTexture);
 	};
-	if (!knightTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\knight.png"))
+	if (!knightTexture.loadFromFile("knight.png"))
 		std::cout << "failed to load knight texture" << std::endl;
-	if (!bishopTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\bishop.png"))
+	if (!bishopTexture.loadFromFile("bishop.png"))
 		std::cout << "failed to load bishop texture" << std::endl;
-	if (!rookTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\rook.png"))
+	if (!rookTexture.loadFromFile("rook.png"))
 		std::cout << "failed to load rook texture" << std::endl;
 	for(int i = 0; i < 2; i++){
 		//knights
@@ -49,9 +49,9 @@ Board::Board(int size) {
 		m_squares[56 + 7 * i] = new Rook(100, 7 * i, 7, -1, m_rookTexture);
 		std::cout << "black rook " << i << " created at (" << (7*i) << ", " << 7 << ")" << std::endl;
 	};
-	if (!queenTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\queen.png"))
+	if (!queenTexture.loadFromFile("queen.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
-	if (!kingTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\king.png"))
+	if (!kingTexture.loadFromFile("king.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
 	for (int i = 0; i < 1; i++) {
 		//queens
@@ -117,8 +117,8 @@ bool Board::checkCheck(Piece * piece) {
 
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	Piece * ppiece = inSpace(currentPos);
-	if (ppiece->legalMove(this, newPos)) {
-		//for some reason, as soon as this legalMove returns a value, it breaks all the textures in board's array
+	if (ppiece->legalMove(this, newPos) && ppiece->getColor() == turn) {
+		//for some reason, as soon as ^this legalMove returns a value, it breaks all the textures in board's m_square array
 		//i'll try changing it to take board pointers instead of board objects
 		//m_movelist.push_back({ currentPos, newPos });
 		ppiece->move(newPos);
@@ -133,6 +133,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		else if (currentPos == m_blackKingPos) {
 			m_blackKingPos = newPos;
 		}
+		turn = -1 * turn;
 	}
 	else {
 		std::cout << "Invalid Move!" << std::endl;
@@ -147,10 +148,11 @@ Piece* Board::inSpace(std::array<int, 2> position) {
 /*
 Board update loop?
 Things to implement
-- turns
+- turns 
 - drawing the objects (should Board handle that and draw all of the pieces too?)
 -- will looping through all squares be too slow?
 - checkmate checker
 - stalemate checker
+- seeing movelist
 
 */
