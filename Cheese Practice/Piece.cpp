@@ -30,7 +30,7 @@ Piece::Piece(int size, int file, int rank, int color, sf::Texture * texture) {
 	if (color == -1) {
 		m_sprite.setColor(sf::Color::Black);
 	}
-	m_sprite.setPosition(sf::Vector2f(file * size, rank * size));
+	m_sprite.setPosition(sf::Vector2f(file * size, (7-rank) * size));
 };
 
 std::array<int, 2> Piece::getPosition() {
@@ -39,7 +39,7 @@ std::array<int, 2> Piece::getPosition() {
 
 void Piece::move(std::array<int, 2> newPos) {
 	m_position.swap(newPos);
-	m_sprite.setPosition(sf::Vector2f(m_position[0]*m_size, m_position[1]*m_size));
+	m_sprite.setPosition(sf::Vector2f(m_position[0]*m_size, (7-m_position[1])*m_size));
 };
 int Piece::getColor() {
 	return m_color;

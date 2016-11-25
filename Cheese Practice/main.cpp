@@ -26,12 +26,12 @@ int main()
 				// key pressed
 			case sf::Event::MouseButtonPressed:
 				if (selectionFlag == 0) {
-					clicky = { event.mouseButton.x / 100, event.mouseButton.y / 100 };
+					clicky = { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 };
 					selectionFlag = 1;
 					std::cout << "Piece selected position x: " << clicky[0] << " y: " << clicky[1] << std::endl;
 				}
 				else {
-					board.movePiece(clicky, { event.mouseButton.x / 100, event.mouseButton.y / 100 });
+					board.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
 					selectionFlag = 0;
 					std::cout << "is something happening?" << std::endl;
 				}

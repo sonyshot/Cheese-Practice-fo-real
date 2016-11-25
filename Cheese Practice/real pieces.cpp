@@ -6,7 +6,7 @@ bool Pawn::legalMove(Board * board, std::array<int, 2> move) {
 	std::array<int, 2> inBetween;
 	inBetween[0] = move[0];
 	inBetween[1] = move[1] - 1;
-	if ((move[1] == m_position[1] + 1) && (abs(move[0] - m_position[0]) < 2)) {
+	if ((move[1] == m_position[1] + m_color*1) && (abs(move[0] - m_position[0]) < 2)) {
 		if ((move[0] == m_position[0]) && !(board->inSpace(move)->getColor())) {
 			return true;
 		}
@@ -17,23 +17,22 @@ bool Pawn::legalMove(Board * board, std::array<int, 2> move) {
 			return false;
 		};
 	}
-	else if (m_position[1] == 1 && m_position[0] == move[0] && move[1] == 3 && !(board->inSpace(move)->getColor()) && !(board->inSpace(inBetween)->getColor())) {
+	else if (m_position[1] == 3.5 - m_color*2.5 && m_position[0] == move[0] && move[1] == m_position[1] + m_color*2 && !(board->inSpace(move)->getColor()) && !(board->inSpace(inBetween)->getColor())) {
 		return true;
 	}
 	else {
 		return false;
 	};
-};
+}; // also need to add en passant and promotion
 
-	//this needs to be redone/actually done
+
 void Pawn::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 };
-	//see above
 
 //KNIGHT----------------------------------------------------------------------------------
 bool Knight::legalMove(Board * board, std::array<int, 2> move) {
-	if (((abs(move[0] - m_position[0]) == 2) && (abs(move[1] - m_position[1] == 1))) || ((abs(move[0] - m_position[0]) == 1) && (abs(move[1] - m_position[1] == 2)))) {
+	if (((abs(move[0] - m_position[0]) == 2) && (abs(move[1] - m_position[1]) == 1)) || ((abs(move[0] - m_position[0]) == 1) && (abs(move[1] - m_position[1]) == 2))) {
 		if (!(board->inSpace(move)->getColor() - m_color))
 			return false;
 		else
