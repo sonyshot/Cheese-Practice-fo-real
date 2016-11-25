@@ -6,12 +6,20 @@
 
 class Board : public sf::Drawable {
 	sf::Texture m_boardTexture;
-	sf::Texture m_pawnTexture;
-	sf::Texture m_knightTexture;
-	sf::Texture m_bishopTexture;
-	sf::Texture m_rookTexture;
-	sf::Texture m_queenTexture;
-	sf::Texture m_kingTexture;
+
+	sf::Texture pawnTexture;
+	sf::Texture knightTexture;
+	sf::Texture bishopTexture;
+	sf::Texture rookTexture;
+	sf::Texture queenTexture;
+	sf::Texture kingTexture;
+
+	sf::Texture * m_pawnTexture = &pawnTexture;
+	sf::Texture * m_knightTexture = &knightTexture;
+	sf::Texture * m_bishopTexture = &bishopTexture;
+	sf::Texture * m_rookTexture = &rookTexture;
+	sf::Texture * m_queenTexture = &queenTexture;
+	sf::Texture * m_kingTexture = &kingTexture;
 
 	sf::Sprite m_sprite;
 	std::array<Piece*, 64> m_squares = {};

@@ -12,13 +12,13 @@ Piece::Piece(int size, const sf::Texture texture) {
 		m_sprite.scale((float)size / 100.f, (float)size / 100.f);
 	};
 };
-Piece::Piece(int size, int file, int rank, int color, const sf::Texture texture) {
+Piece::Piece(int size, int file, int rank, int color, sf::Texture * texture) {
 	m_position = { file, rank };
 
 	//-1 for black, 1 for white, 0 for empty square
 	m_color = color;
 
-	m_sprite.setTexture(texture);
+	m_sprite.setTexture(*texture);
 	if (size != 100) {//current piece textures are 100x100, this scales appropriately if the board is a different size
 		m_sprite.scale((float)size / 100.f, (float)size / 100.f);
 	};

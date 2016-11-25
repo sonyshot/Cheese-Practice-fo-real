@@ -1,4 +1,3 @@
-#include <SFML\Graphics.hpp>
 #include <iostream>
 #include <array>
 #include "Board.h"
@@ -24,21 +23,23 @@ Board::Board(int size) {
 
 	m_sprite.setTexture(m_boardTexture);
 
-	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\pawn.png"))
+	if (!pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\pawn.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
 	for (int i = 0; i < 8; i++) {//create pawns on the board
 		m_squares[8 + i] = new Pawn(100, i, 1, 1, m_pawnTexture);
+		std::cout << "white pawn " << i << " created at (" << i << ", " << 1 << ")" << std::endl;
 		m_squares[48 + i] = new Pawn(100, i, 6, -1, m_pawnTexture);
 	};
-	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\knight.png"))
+	if (!knightTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\knight.png"))
 		std::cout << "failed to load knight texture" << std::endl;
-	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\bishop.png"))
+	if (!bishopTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\bishop.png"))
 		std::cout << "failed to load bishop texture" << std::endl;
-	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\rook.png"))
+	if (!rookTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\rook.png"))
 		std::cout << "failed to load rook texture" << std::endl;
 	for(int i = 0; i < 2; i++){
 		//knights
 		m_squares[1 + i * 5] = new Knight(100, 1 + 5 * i, 0, 1, m_knightTexture);
+		std::cout << "white knight " << i << " created at (" << (1 + 5*i) << ", " << 0 << ")" << std::endl;
 		m_squares[57 + i * 5] = new Knight(100, 1 + 5 * i, 7, -1, m_knightTexture);
 		//bishops
 		m_squares[2 + i * 3] = new Bishop(100, 2 + 3 * i, 0, 1, m_bishopTexture);
@@ -47,9 +48,9 @@ Board::Board(int size) {
 		m_squares[7 * i] = new Rook(100, 7 * i, 0, 1, m_rookTexture);
 		m_squares[56 + 7 * i] = new Rook(100, 7 * i, 7, -1, m_rookTexture);
 	};
-	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\queen.png"))
+	if (!queenTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\queen.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
-	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\king.png"))
+	if (!kingTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\king.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
 	for (int i = 0; i < 1; i++) {
 		//queens
@@ -103,6 +104,9 @@ Board::~Board() {
 //draw sprite lel
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
+	for (int i = 0; i < 63; i++) {
+		target.draw(*m_squares[i], states);
+	};
 };
 //see above
 

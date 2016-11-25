@@ -47,7 +47,6 @@ bool Knight::legalMove(Board board, std::array<int, 2> move) {
 	//this needs to be redone/actually done
 void Knight::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
-	std::cout << "plz work" << std::endl;
 };
 	//see above
 
@@ -193,12 +192,12 @@ EmptySquare::EmptySquare() {
 	m_color = 0;
 };
 
-EmptySquare::EmptySquare(int size, const sf::Texture texture) {
+EmptySquare::EmptySquare(int size, const sf::Texture * texture) {
 	m_position = { 0, 0 };
 	m_color = 0;
 };
 
-EmptySquare::EmptySquare(int size, int file, int rank, int color, const sf::Texture texture) {
+EmptySquare::EmptySquare(int size, int file, int rank, int color, const sf::Texture * texture) {
 	m_position = { file, rank };
 	m_color = 0;
 };

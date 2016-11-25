@@ -85,9 +85,9 @@ class EmptySquare : public Piece{
 public:
 	EmptySquare();
 
-	EmptySquare(int size, const sf::Texture texture);
+	EmptySquare(int size, const sf::Texture * texture);
 
-	EmptySquare(int size, int file, int rank, int color, const sf::Texture texture);
+	EmptySquare(int size, int file, int rank, int color, const sf::Texture * texture);
 
 	bool legalMove(Board board, std::array<int, 2> move);
 
