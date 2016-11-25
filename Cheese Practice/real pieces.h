@@ -83,7 +83,11 @@ class EmptySquare : public Piece{
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
-	using Piece::Piece;
+	EmptySquare();
+
+	EmptySquare(int size, const sf::Texture texture);
+
+	EmptySquare(int size, int file, int rank, int color, const sf::Texture texture);
 
 	bool legalMove(Board board, std::array<int, 2> move);
 

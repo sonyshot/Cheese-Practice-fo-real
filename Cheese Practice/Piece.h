@@ -13,7 +13,9 @@ protected:
 public:
 	Piece();
 
-	Piece(int file, int rank, int color);
+	Piece(int size, const sf::Texture texture);
+
+	Piece(int size, int file, int rank, int color, const sf::Texture texture);
 
 	std::array<int, 2> getPosition();
 

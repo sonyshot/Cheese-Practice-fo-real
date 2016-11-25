@@ -5,7 +5,14 @@
 #include "Piece.h"
 
 class Board : public sf::Drawable {
-	sf::Texture m_texture;
+	sf::Texture m_boardTexture;
+	sf::Texture m_pawnTexture;
+	sf::Texture m_knightTexture;
+	sf::Texture m_bishopTexture;
+	sf::Texture m_rookTexture;
+	sf::Texture m_queenTexture;
+	sf::Texture m_kingTexture;
+
 	sf::Sprite m_sprite;
 	std::array<Piece*, 64> m_squares = {};
 	std::array<int, 2> m_whiteKingPos;

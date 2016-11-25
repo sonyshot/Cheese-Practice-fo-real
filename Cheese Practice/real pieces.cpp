@@ -188,6 +188,21 @@ void King::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	//see above
 
 //EMPTY-----------------------------------------------------------------
+EmptySquare::EmptySquare() {
+	m_position = { 0, 0 };
+	m_color = 0;
+};
+
+EmptySquare::EmptySquare(int size, const sf::Texture texture) {
+	m_position = { 0, 0 };
+	m_color = 0;
+};
+
+EmptySquare::EmptySquare(int size, int file, int rank, int color, const sf::Texture texture) {
+	m_position = { file, rank };
+	m_color = 0;
+};
+
 bool EmptySquare::legalMove(Board board, std::array<int, 2> move) {
 	return false;
 };

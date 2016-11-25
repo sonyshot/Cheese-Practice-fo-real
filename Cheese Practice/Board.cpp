@@ -8,50 +8,62 @@
 Board::Board(int size) {
 	//size should be a multiple of 8, not sure how it will draw otherwise
 	sf::Image blackSquare;
-	blackSquare.create(size/8, size/8, sf::Color::Black);
+	blackSquare.create(size/8, size/8, sf::Color (50, 50, 50, 255));
 	sf::Image whiteSquare;
-	whiteSquare.create(size/8, size/8, sf::Color::White);
+	whiteSquare.create(size/8, size/8, sf::Color (200, 200, 200, 255));
 
-	m_texture.create(size, size);
+	m_boardTexture.create(size, size);
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			if ((i + j) % 2 == 0)
-				m_texture.update(whiteSquare, i*size / 8, j*size / 8);
+				m_boardTexture.update(whiteSquare, i*size / 8, j*size / 8);
 			else
-				m_texture.update(blackSquare, i*size / 8, j*size / 8);
+				m_boardTexture.update(blackSquare, i*size / 8, j*size / 8);
 		};
 	};
 
-	m_sprite.setTexture(m_texture);
+	m_sprite.setTexture(m_boardTexture);
 
+	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\pawn.png"))
+		std::cout << "failed to load pawn texture" << std::endl;
 	for (int i = 0; i < 8; i++) {//create pawns on the board
-		m_squares[8 + i] = new Pawn(i, 1, 1);
-		m_squares[48 + i] = new Pawn(i, 6, -1);
+		m_squares[8 + i] = new Pawn(100, i, 1, 1, m_pawnTexture);
+		m_squares[48 + i] = new Pawn(100, i, 6, -1, m_pawnTexture);
 	};
+	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\knight.png"))
+		std::cout << "failed to load knight texture" << std::endl;
+	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\bishop.png"))
+		std::cout << "failed to load bishop texture" << std::endl;
+	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\rook.png"))
+		std::cout << "failed to load rook texture" << std::endl;
 	for(int i = 0; i < 2; i++){
 		//knights
-		m_squares[1 + i * 5] = new Knight(1 + 5 * i, 0, 1);
-		m_squares[57 + i * 5] = new Knight(1 + 5 * i, 7, -1);
+		m_squares[1 + i * 5] = new Knight(100, 1 + 5 * i, 0, 1, m_knightTexture);
+		m_squares[57 + i * 5] = new Knight(100, 1 + 5 * i, 7, -1, m_knightTexture);
 		//bishops
-		m_squares[2 + i * 3] = new Bishop(2 + 3 * i, 0, 1);
-		m_squares[58 + i * 3] = new Bishop(2 + 3 * i, 7, -1);
+		m_squares[2 + i * 3] = new Bishop(100, 2 + 3 * i, 0, 1, m_bishopTexture);
+		m_squares[58 + i * 3] = new Bishop(100, 2 + 3 * i, 7, -1, m_bishopTexture);
 		//rooks
-		m_squares[7 * i] = new Rook(7 * i, 0, 1);
-		m_squares[56 + 7 * i] = new Rook(7 * i, 7, -1);
+		m_squares[7 * i] = new Rook(100, 7 * i, 0, 1, m_rookTexture);
+		m_squares[56 + 7 * i] = new Rook(100, 7 * i, 7, -1, m_rookTexture);
 	};
+	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\queen.png"))
+		std::cout << "failed to load pawn texture" << std::endl;
+	if (!m_pawnTexture.loadFromFile("C:\\Users\\GM\\Pictures\\cheese\\king.png"))
+		std::cout << "failed to load pawn texture" << std::endl;
 	for (int i = 0; i < 1; i++) {
 		//queens
-		m_squares[3] = new Queen(3, 0, 1);
-		m_squares[59] = new Queen(3, 7, -1);
+		m_squares[3] = new Queen(100, 3, 0, 1, m_queenTexture);
+		m_squares[59] = new Queen(100, 3, 7, -1, m_queenTexture);
 		//kings
 		m_whiteKingPos = { 4, 0 };
 		m_blackKingPos = { 4, 7 };
-		m_squares[4] = new King(4, 0, 1);
-		m_squares[60] = new King(4, 7, -1);
+		m_squares[4] = new King(100, 4, 0, 1, m_kingTexture);
+		m_squares[60] = new King(100, 4, 7, -1, m_kingTexture);
 	};
 	
 	for (int i = 0; i < 32; i++) {//fill the rest of the board with empty squares
-		m_squares[16 + i] = new EmptySquare(i % 8, 2 + i / 8, 0);
+		m_squares[16 + i] = new EmptySquare(100, i % 8, 2 + i / 8, 0, m_kingTexture);
 	};
 };
 Board::Board(int size, std::array<Piece*, 64> squares, std::array<int, 2> whiteKingPos, std::array<int, 2> blackKingPos) {
@@ -61,17 +73,17 @@ Board::Board(int size, std::array<Piece*, 64> squares, std::array<int, 2> whiteK
 	sf::Image whiteSquare;
 	whiteSquare.create(size / 8, size / 8, sf::Color::White);
 
-	m_texture.create(size, size);
+	m_boardTexture.create(size, size);
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			if ((i + j) % 2 == 0)
-				m_texture.update(whiteSquare, i*size / 8, j*size / 8);
+				m_boardTexture.update(whiteSquare, i*size / 8, j*size / 8);
 			else
-				m_texture.update(blackSquare, i*size / 8, j*size / 8);
+				m_boardTexture.update(blackSquare, i*size / 8, j*size / 8);
 		};
 	};
 
-	m_sprite.setTexture(m_texture);
+	m_sprite.setTexture(m_boardTexture);
 
 	m_squares.swap(squares);
 	m_whiteKingPos = whiteKingPos;
@@ -106,7 +118,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		ppiece->move(newPos);
 		delete m_squares[newPos[0] + 8 * newPos[1]];
 		m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
-		m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(currentPos[0], currentPos[1], 0);
+		m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture);
 		std::cout << "Piece Moved!" << std::endl;
 
 		if (currentPos == m_whiteKingPos) {

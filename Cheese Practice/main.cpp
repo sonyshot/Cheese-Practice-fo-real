@@ -7,7 +7,7 @@
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(800, 800), "board drawing test");
-	Board board(400);
+	Board board(800);
 
 	while (window.isOpen())
 	{
