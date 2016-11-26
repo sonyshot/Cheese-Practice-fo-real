@@ -27,6 +27,9 @@
     <ClCompile Include="Board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="array conversion therapy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -36,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="real pieces.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="array conversion therapy.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

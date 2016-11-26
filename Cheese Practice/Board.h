@@ -2,6 +2,7 @@
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include <array>
+#include <string>
 #include "Piece.h"
 
 class Board : public sf::Drawable {
@@ -26,6 +27,9 @@ class Board : public sf::Drawable {
 	std::array<int, 2> m_whiteKingPos;
 	std::array<int, 2> m_blackKingPos;
 	std::vector<std::array<std::array<int, 2>, 2>> m_movelist;
+	std::string m_printMoves = "Movelist:\n";
+	sf::Font m_font;
+	sf::Text m_text;
 	int turn = 1;
 public:
 	//constructor(s) here?
@@ -46,4 +50,6 @@ public:
 	void movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos);
 
 	Piece* inSpace(std::array<int, 2> position);
+
+	std::array<std::array<int, 2>, 2> priorMove(int moveNumber);
 };

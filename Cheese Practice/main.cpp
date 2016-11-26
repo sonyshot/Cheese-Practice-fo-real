@@ -6,7 +6,7 @@
 //copy pasta'd window loop from sfml website
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(800, 800), "board drawing test");
+	sf::RenderWindow window(sf::VideoMode(1000, 800), "board drawing test");
 	Board board(800);
 	std::array<int, 2> clicky;
 	int selectionFlag = 0;
@@ -33,7 +33,6 @@ int main()
 				else {
 					board.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
 					selectionFlag = 0;
-					std::cout << "is something happening?" << std::endl;
 				}
 				break;
 

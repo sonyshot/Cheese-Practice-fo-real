@@ -2,14 +2,15 @@
 #include <array>
 #include "Board.h"
 #include "real pieces.h"
+#include "array conversion therapy.h"
 
 
 Board::Board(int size) {
 	//size should be a multiple of 8, not sure how it will draw otherwise
 	sf::Image blackSquare;
-	blackSquare.create(size/8, size/8, sf::Color (50, 50, 50, 255));
+	blackSquare.create(size / 8, size / 8, sf::Color(50, 50, 50, 255));
 	sf::Image whiteSquare;
-	whiteSquare.create(size/8, size/8, sf::Color (200, 200, 200, 255));
+	whiteSquare.create(size / 8, size / 8, sf::Color(200, 200, 200, 255));
 
 	m_boardTexture.create(size, size);
 	for (int i = 0; i < 8; i++) {
@@ -22,6 +23,14 @@ Board::Board(int size) {
 	};
 
 	m_sprite.setTexture(m_boardTexture);
+
+	if (!m_font.loadFromFile("C:\\Windows\\Fonts\\chiller.ttf")) {
+		std::cout << "failed to load font" << std::endl;
+	}
+	m_text.setFont(m_font);
+	m_text.setString(m_printMoves);
+	m_text.setFillColor(sf::Color::White);
+	m_text.setPosition(800.f, 0.f);
 
 	if (!pawnTexture.loadFromFile("pawn.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
@@ -36,10 +45,10 @@ Board::Board(int size) {
 		std::cout << "failed to load bishop texture" << std::endl;
 	if (!rookTexture.loadFromFile("rook.png"))
 		std::cout << "failed to load rook texture" << std::endl;
-	for(int i = 0; i < 2; i++){
+	for (int i = 0; i < 2; i++) {
 		//knights
 		m_squares[1 + i * 5] = new Knight(100, 1 + 5 * i, 0, 1, m_knightTexture);
-		std::cout << "white knight " << i << " created at (" << (1 + 5*i) << ", " << 0 << ")" << std::endl;
+		std::cout << "white knight " << i << " created at (" << (1 + 5 * i) << ", " << 0 << ")" << std::endl;
 		m_squares[57 + i * 5] = new Knight(100, 1 + 5 * i, 7, -1, m_knightTexture);
 		//bishops
 		m_squares[2 + i * 3] = new Bishop(100, 2 + 3 * i, 0, 1, m_bishopTexture);
@@ -47,7 +56,7 @@ Board::Board(int size) {
 		//rooks
 		m_squares[7 * i] = new Rook(100, 7 * i, 0, 1, m_rookTexture);
 		m_squares[56 + 7 * i] = new Rook(100, 7 * i, 7, -1, m_rookTexture);
-		std::cout << "black rook " << i << " created at (" << (7*i) << ", " << 7 << ")" << std::endl;
+		std::cout << "black rook " << i << " created at (" << (7 * i) << ", " << 7 << ")" << std::endl;
 	};
 	if (!queenTexture.loadFromFile("queen.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
@@ -63,7 +72,7 @@ Board::Board(int size) {
 		m_squares[4] = new King(100, 4, 0, 1, m_kingTexture);
 		m_squares[60] = new King(100, 4, 7, -1, m_kingTexture);
 	};
-	
+
 	for (int i = 0; i < 32; i++) {//fill the rest of the board with empty squares
 		m_squares[16 + i] = new EmptySquare(100, i % 8, 2 + i / 8, 0, m_kingTexture);
 	};
@@ -98,9 +107,6 @@ Board::~Board() {
 	};
 };
 
-//create white and black square images
-//map them appropriately to a texture
-//send texture to sprite
 //-------maybe put above in constructor? no need to create a texture every time this is drawn--------
 //draw sprite lel
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -108,6 +114,7 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	for (int i = 0; i < 64; i++) {
 		target.draw(*m_squares[i], states);
 	};
+	target.draw(m_text, states);
 };
 //see above
 
@@ -120,7 +127,8 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 	if (ppiece->legalMove(this, newPos) && ppiece->getColor() == turn) {
 		//for some reason, as soon as ^this legalMove returns a value, it breaks all the textures in board's m_square array
 		//i'll try changing it to take board pointers instead of board objects
-		//m_movelist.push_back({ currentPos, newPos });
+		m_movelist.push_back({ currentPos, newPos });
+		m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos })));
 		ppiece->move(newPos);
 		delete m_squares[newPos[0] + 8 * newPos[1]];
 		m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
@@ -139,17 +147,20 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		std::cout << "Invalid Move!" << std::endl;
 	};
 };
-	
+
 Piece* Board::inSpace(std::array<int, 2> position) {
 	return m_squares[position[0] + 8 * position[1]];
 };
 
+std::array<std::array<int, 2>, 2> Board::priorMove(int moveNumber) {
+	return m_movelist[moveNumber - 1];
+};
 
 /*
 Board update loop?
 Things to implement
-- turns 
-- drawing the objects (should Board handle that and draw all of the pieces too?)
+- turns *DONE*
+- drawing the objects (should Board handle that and draw all of the pieces too?) *DONE*
 -- will looping through all squares be too slow?
 - checkmate checker
 - stalemate checker

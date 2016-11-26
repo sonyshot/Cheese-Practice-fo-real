@@ -74,6 +74,8 @@ public:
 
 	bool legalMove(Board * board, std::array<int, 2> move);
 
+	bool legalCastle(Board * board, std::array<int, 2> move);
+
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	//see above

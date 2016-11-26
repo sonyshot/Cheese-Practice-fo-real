@@ -118,12 +118,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="array conversion therapy.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Piece.cpp" />
     <ClCompile Include="real pieces.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="array conversion therapy.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="Piece.h" />
     <ClInclude Include="real pieces.h" />
