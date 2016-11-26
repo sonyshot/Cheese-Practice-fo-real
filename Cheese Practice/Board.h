@@ -27,7 +27,7 @@ class Board : public sf::Drawable {
 	std::array<int, 2> m_whiteKingPos;
 	std::array<int, 2> m_blackKingPos;
 	std::vector<std::array<std::array<int, 2>, 2>> m_movelist;
-	std::string m_printMoves = "Movelist:\n";
+	std::string m_printMoves = "Movelist:";
 	sf::Font m_font;
 	sf::Text m_text;
 	int turn = 1;
@@ -49,7 +49,9 @@ public:
 
 	void movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos);
 
+	void removePiece(std::array<int, 2> currentPos);
+
 	Piece* inSpace(std::array<int, 2> position);
 
-	std::array<std::array<int, 2>, 2> priorMove(int moveNumber);
+	std::array<std::array<int, 2>, 2> previousMove(int moveNumber);
 };

@@ -5,9 +5,11 @@ class Pawn : public Piece{
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
-	using Piece::Piece;
+	Pawn(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(Board * board, std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move);
+
+	void move(std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -18,9 +20,9 @@ class Knight : public Piece{
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
-	using Piece::Piece;
+	Knight::Knight(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(Board * board, std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -31,9 +33,9 @@ class Bishop : public Piece {
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
-	using Piece::Piece;
+	Bishop::Bishop(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(Board * board, std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -44,9 +46,9 @@ class Rook : public Piece{
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
-	using Piece::Piece;
+	Rook::Rook(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(Board * board, std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -56,10 +58,11 @@ public:
 class Queen : public Piece {
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
+	std::string pieceType = "Q";
 public:
-	using Piece::Piece;
+	Queen::Queen(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(Board * board, std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -70,11 +73,9 @@ class King : public Piece {
 	//inherits m_position, m_sprite, m_color
 	//inherits getPosition, getColor, move
 public:
-	using Piece::Piece;
+	King::King(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(Board * board, std::array<int, 2> move);
-
-	bool legalCastle(Board * board, std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -89,9 +90,9 @@ public:
 
 	EmptySquare(int size, const sf::Texture * texture);
 
-	EmptySquare(int size, int file, int rank, int color, const sf::Texture * texture);
+	EmptySquare(int size, int file, int rank, int color, const sf::Texture * texture, Board * board);
 
-	bool legalMove(Board * board, std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;

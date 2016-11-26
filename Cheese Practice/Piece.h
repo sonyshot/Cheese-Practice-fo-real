@@ -11,20 +11,24 @@ protected:
 	int m_color;
 	sf::Sprite m_sprite;
 	float m_size;
+	Board * m_currentBoard;
+	std::string m_name;
 public:
 	Piece();
 
 	Piece(int size, const sf::Texture texture);
 
-	Piece(int size, int file, int rank, int color, sf::Texture * texture);
+	Piece(int size, int file, int rank, int color, sf::Texture * texture, Board * board, std::string identifier);
 
 	std::array<int, 2> getPosition();
 
-	void move(std::array<int, 2> newPos);
+	virtual void move(std::array<int, 2> newPos);
 
 	int getColor();
 
-	virtual bool legalMove(Board * board, std::array<int, 2> move) = 0;
+	std::string getName();
+
+	virtual bool legalMove(std::array<int, 2> move) = 0;
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 };

@@ -15,7 +15,7 @@ Piece::Piece(int size, const sf::Texture texture) {
 	};
 	m_size = 100.f;
 };
-Piece::Piece(int size, int file, int rank, int color, sf::Texture * texture) {
+Piece::Piece(int size, int file, int rank, int color, sf::Texture * texture, Board * board, std::string identifier) {
 	m_position = { file, rank };
 
 	//-1 for black, 1 for white, 0 for empty square
@@ -31,6 +31,8 @@ Piece::Piece(int size, int file, int rank, int color, sf::Texture * texture) {
 		m_sprite.setColor(sf::Color::Black);
 	}
 	m_sprite.setPosition(sf::Vector2f(file * size, (7-rank) * size));
+	m_currentBoard = board;
+	m_name = identifier;
 };
 
 std::array<int, 2> Piece::getPosition() {
@@ -44,3 +46,6 @@ void Piece::move(std::array<int, 2> newPos) {
 int Piece::getColor() {
 	return m_color;
 };
+std::string Piece::getName() {
+	return m_name;
+}
