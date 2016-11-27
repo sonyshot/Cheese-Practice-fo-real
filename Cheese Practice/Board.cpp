@@ -24,7 +24,7 @@ Board::Board(int size) {
 
 	m_sprite.setTexture(m_boardTexture);
 
-	if (!m_font.loadFromFile("C:\\Windows\\Fonts\\chiller.ttf")) {
+	if (!m_font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf")) {
 		std::cout << "failed to load font" << std::endl;
 	}
 	m_text.setFont(m_font);
@@ -122,26 +122,54 @@ bool Board::checkCheck(Piece * piece) {
 	return piece->legalMove(!(piece->getColor() + 1) ? m_whiteKingPos : m_blackKingPos);
 };
 
+bool Board::inCheckCheck(std::array<int, 2> kingPos) {
+	for (int i = 0; i < 64; i++) {
+		if (m_squares[i]->getColor() == -1 * turn && m_squares[i]->legalMove(kingPos)) {
+			return true;
+		}
+	};
+	return false;
+};
+
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
-	Piece * ppiece = inSpace(currentPos);
-	if (ppiece->legalMove(newPos) && ppiece->getColor() == turn) {
+	Piece * ppiece = this->inSpace(currentPos);
+	if (this->inSpace(currentPos)->getColor() == turn && ppiece->legalMove(newPos)){
 		//for some reason, as soon as ^this legalMove returns a value, it breaks all the textures in board's m_square array
 		//i'll try changing it to take board pointers instead of board objects
-		m_movelist.push_back({ currentPos, newPos });
-		m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, ppiece)));
-		ppiece->move(newPos);
-		delete m_squares[newPos[0] + 8 * newPos[1]];
-		m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
-		m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
-		std::cout << "Piece Moved!" << std::endl;
+		if (ppiece->canCastle(newPos)) {
+			//do something
+		}
+		else if (ppiece->canPromote(newPos)) {
+			m_movelist.push_back({ currentPos, newPos });
+			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos))));
+			delete m_squares[newPos[0] + 8 * newPos[1]];
+			delete m_squares[currentPos[0] + 8 * currentPos[1]];
+			m_squares[newPos[0] + 8 * newPos[1]] = new Queen(100, newPos[0], newPos[1], turn, m_queenTexture, this);
+			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
+			std::cout << "pawn promoted" << std::endl;
 
-		if (currentPos == m_whiteKingPos) {
-			m_whiteKingPos = newPos;
+			turn = -1 * turn;
 		}
-		else if (currentPos == m_blackKingPos) {
-			m_blackKingPos = newPos;
+		else if (ppiece->canEnPassant(newPos)) {
+			//do something
 		}
-		turn = -1 * turn;
+		else {
+			m_movelist.push_back({ currentPos, newPos });
+			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos))));
+			ppiece->move(newPos);
+			delete m_squares[newPos[0] + 8 * newPos[1]];
+			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
+			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
+			std::cout << "Piece Moved!" << std::endl;
+
+			if (currentPos == m_whiteKingPos) {
+				m_whiteKingPos = newPos;
+			}
+			else if (currentPos == m_blackKingPos) {
+				m_blackKingPos = newPos;
+			}
+			turn = -1 * turn;
+		}
 	}
 	else {
 		std::cout << "Invalid Move!" << std::endl;

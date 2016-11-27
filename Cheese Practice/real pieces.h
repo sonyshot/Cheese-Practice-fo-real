@@ -9,7 +9,9 @@ public:
 
 	bool legalMove(std::array<int, 2> move);
 
-	void move(std::array<int, 2> move);
+	bool canPromote(std::array<int, 2> move);
+
+	bool canEnPassant(std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -76,6 +78,8 @@ public:
 	King::King(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
 	bool legalMove(std::array<int, 2> move);
+
+	bool canCastle(std::array<int, 2> move);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;

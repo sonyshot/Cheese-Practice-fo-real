@@ -25,16 +25,21 @@ bool Pawn::legalMove(std::array<int, 2> move) {
 	else {
 		return false;
 	};
-}; // also need to add en passant and promotion
-
-void Pawn::move(std::array<int, 2> move) {
-	m_position.swap(move);
-	m_sprite.setPosition(sf::Vector2f(m_position[0] * m_size, (7 - m_position[1])*m_size));
 };
-
 
 void Pawn::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
+};
+
+bool Pawn::canPromote(std::array<int, 2> move) {
+	if (move[1] == 3.5 + m_color*3.5)
+		return true;
+	else
+		return false;
+};
+
+bool Pawn::canEnPassant(std::array<int, 2> move) {
+	return false;
 };
 
 //KNIGHT----------------------------------------------------------------------------------
@@ -209,6 +214,37 @@ bool King::legalMove(std::array<int, 2> move) {
 	//this needs to be redone/actually done
 void King::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
+};
+
+bool King::canCastle(std::array<int, 2> move) {
+	if (!this->hasMoved()) {
+		if (move[0] == 4 && !m_currentBoard->inSpace({ 7, (int)(3.5 - 3.5*m_color) })->hasMoved()) {
+			if (!m_currentBoard->inSpace({ 5, (int)(3.5 - 3.5*m_color) })->getColor() && !m_currentBoard->inSpace({ 6, (int)(3.5 - 3.5*m_color) })->getColor()) {
+				for (int i = 0; i < 2; i++) {
+					if (m_currentBoard->inCheckCheck({ 4 + i, (int)(3.5 - 3.5*m_color) }))
+						return false;
+				};
+				return true;
+			}
+			else
+				return false;
+		}
+		else if(move[0] == 2 && !m_currentBoard->inSpace({ 0, (int)(3.5 - 3.5*m_color) })->hasMoved()){
+			if (!m_currentBoard->inSpace({ 1, (int)(3.5 - 3.5*m_color) })->getColor() && !m_currentBoard->inSpace({ 2, (int)(3.5 - 3.5*m_color) })->getColor() && !m_currentBoard->inSpace({ 3, (int)(3.5 - 3.5*m_color) })->getColor()) {
+				for (int i = 0; i < 3; i++) {
+					if (m_currentBoard->inCheckCheck({ 1 + i, (int)(3.5 - 3.5*m_color) }))
+						return false;
+				};
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+			return false;
+	}
+	else
+		return false;
 };
 	//see above
 

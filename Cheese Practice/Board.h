@@ -47,6 +47,8 @@ public:
 
 	bool checkCheck(Piece * piece);
 
+	bool inCheckCheck(std::array<int, 2> kingPos);
+
 	void movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos);
 
 	void removePiece(std::array<int, 2> currentPos);

@@ -1,4 +1,5 @@
 #include "Piece.h"
+#include "Board.h"
 
 Piece::Piece() {
 	m_position = { 0, 0 };
@@ -35,13 +36,25 @@ Piece::Piece(int size, int file, int rank, int color, sf::Texture * texture, Boa
 	m_name = identifier;
 };
 
-std::array<int, 2> Piece::getPosition() {
-	return m_position;
-};
-
 void Piece::move(std::array<int, 2> newPos) {
+	m_hasMoved = 1;
 	m_position.swap(newPos);
 	m_sprite.setPosition(sf::Vector2f(m_position[0]*m_size, (7-m_position[1])*m_size));
+};
+bool Piece::canCastle(std::array<int, 2> move) {
+	return false;
+};
+
+bool Piece::canPromote(std::array<int, 2> move) {
+	return false;
+};
+
+bool Piece::canEnPassant(std::array<int, 2> move) {
+	return false;
+};
+
+bool Piece::hasMoved() {
+	return m_hasMoved;
 };
 int Piece::getColor() {
 	return m_color;
@@ -49,3 +62,6 @@ int Piece::getColor() {
 std::string Piece::getName() {
 	return m_name;
 }
+std::array<int, 2> Piece::getPosition() {
+	return m_position;
+};
