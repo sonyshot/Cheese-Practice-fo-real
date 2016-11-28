@@ -118,13 +118,11 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 };
 //see above
 
-bool Board::checkCheck(Piece * piece) {
-	return piece->legalMove(!(piece->getColor() + 1) ? m_whiteKingPos : m_blackKingPos);
-};
-
 bool Board::inCheckCheck(std::array<int, 2> kingPos) {
 	for (int i = 0; i < 64; i++) {
 		if (m_squares[i]->getColor() == -1 * turn && m_squares[i]->legalMove(kingPos)) {
+			//something is happening here when the loop gets to black's pawns
+			//it checks for legal move with blacks king and pushes the inSpace call out of array bounds
 			return true;
 		}
 	};
@@ -133,15 +131,35 @@ bool Board::inCheckCheck(std::array<int, 2> kingPos) {
 
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	Piece * ppiece = this->inSpace(currentPos);
-	if (this->inSpace(currentPos)->getColor() == turn && ppiece->legalMove(newPos)){
+	if (ppiece->getColor() == turn && ppiece->legalMove(newPos) && !(this->inCheckCheck((turn == 1) ?( m_blackKingPos) : (m_whiteKingPos)))) {
 		//for some reason, as soon as ^this legalMove returns a value, it breaks all the textures in board's m_square array
 		//i'll try changing it to take board pointers instead of board objects
 		if (ppiece->canCastle(newPos)) {
-			//do something
+			m_movelist.push_back({ currentPos, newPos });
+			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 1)));
+			delete m_squares[newPos[0] + 8 * newPos[1]];
+			m_squares[newPos[0] + 8 * newPos[1]] = ppiece;
+			ppiece->move(newPos);
+			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
+			if (newPos[0] > currentPos[0]) {
+				delete m_squares[newPos[0] - 1 + 8 * newPos[1]];
+				m_squares[7 + 8 * newPos[1]]->move({5, newPos[1]});
+				m_squares[newPos[0] - 1 + 8 * newPos[1]] = m_squares[newPos[0] + 1 + 8 * newPos[1]];
+				m_squares[newPos[0] + 1 + 8 * newPos[1]] = new EmptySquare(0, newPos[0] + 1, newPos[1], 0, m_kingTexture, this);
+			}
+			else {
+				delete m_squares[3 + 8 * newPos[1]];
+				m_squares[8 * newPos[1]]->move({ 0, newPos[1] });
+				m_squares[3 + 8 * newPos[1]] = m_squares[8 * currentPos[1]];
+				m_squares[8 * currentPos[1]] = new EmptySquare(0, 0, newPos[1], 0, m_kingTexture, this);
+			}
+			std::cout << "castled" << std::endl;
+
+			turn = -1 * turn;
 		}
 		else if (ppiece->canPromote(newPos)) {
 			m_movelist.push_back({ currentPos, newPos });
-			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos))));
+			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 2)));
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			delete m_squares[currentPos[0] + 8 * currentPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = new Queen(100, newPos[0], newPos[1], turn, m_queenTexture, this);
@@ -151,11 +169,21 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			turn = -1 * turn;
 		}
 		else if (ppiece->canEnPassant(newPos)) {
-			//do something
+			m_movelist.push_back({ currentPos, newPos });
+			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 3)));
+			ppiece->move(newPos);
+			delete m_squares[newPos[0] + 8 * (newPos[1] - turn)];
+			m_squares[newPos[0] + 8 * (newPos[1] - 1)] = new EmptySquare(0, newPos[0], newPos[1] - turn, 0, m_kingTexture, this);
+			delete m_squares[newPos[0] + 8 * newPos[1]];
+			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8*currentPos[1]];
+			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
+			std::cout << "en passant" << std::endl;
+
+			turn = -1 * turn;
 		}
 		else {
 			m_movelist.push_back({ currentPos, newPos });
-			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos))));
+			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 0)));
 			ppiece->move(newPos);
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
@@ -184,8 +212,8 @@ Piece* Board::inSpace(std::array<int, 2> position) {
 	return m_squares[position[0] + 8 * position[1]];
 };
 
-std::array<std::array<int, 2>, 2> Board::previousMove(int moveNumber) {
-	return m_movelist[moveNumber - 1];
+std::array<std::array<int, 2>, 2> Board::previousMove() {
+	return (m_movelist.size() == 0) ? (std::array<std::array<int, 2>, 2> { std::array<int, 2> {0, 0}, std::array<int, 2> {0, 0}}) : (m_movelist[m_movelist.size() - 1]);
 };
 
 /*

@@ -45,8 +45,6 @@ public:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	//see above
 
-	bool checkCheck(Piece * piece);
-
 	bool inCheckCheck(std::array<int, 2> kingPos);
 
 	void movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos);
@@ -55,5 +53,5 @@ public:
 
 	Piece* inSpace(std::array<int, 2> position);
 
-	std::array<std::array<int, 2>, 2> previousMove(int moveNumber);
+	std::array<std::array<int, 2>, 2> previousMove();
 };

@@ -5,6 +5,8 @@
 Pawn::Pawn(int size, int file, int rank, int color, sf::Texture * texture, Board * board) :Piece(size, file, rank, color, texture, board, "") {};
 
 bool Pawn::legalMove(std::array<int, 2> move) {
+	if (this->canEnPassant(move))
+		return true;
 	std::array<int, 2> inBetween;
 	inBetween[0] = move[0];
 	inBetween[1] = move[1] - m_color;
@@ -39,7 +41,11 @@ bool Pawn::canPromote(std::array<int, 2> move) {
 };
 
 bool Pawn::canEnPassant(std::array<int, 2> move) {
-	return false;
+	//if piece on either side is a pawn and the previous move was two squares in length and ended on the square adjacent
+	if (m_currentBoard->inSpace({ move[0], move[1] - m_color })->getName() == "" && m_currentBoard->previousMove()[0] == std::array<int, 2> {move[0], move[1] + m_color} && m_currentBoard->previousMove()[1] == std::array<int, 2> {move[0], move[1] - m_color})
+		return true;
+	else
+		return false;
 };
 
 //KNIGHT----------------------------------------------------------------------------------
@@ -201,7 +207,9 @@ King::King(int size, int file, int rank, int color, sf::Texture * texture, Board
 };
 
 bool King::legalMove(std::array<int, 2> move) {
-	if ((abs(move[0] - m_position[0]) <= 1) && (abs(move[1] - m_position[1]) <= 1)) {
+	if (this->canCastle(move))
+		return true;
+	else if ((abs(move[0] - m_position[0]) <= 1) && (abs(move[1] - m_position[1]) <= 1)) {
 		if (!(m_currentBoard->inSpace(move)->getColor() - m_color))
 			return false;
 		else
@@ -218,7 +226,7 @@ void King::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 
 bool King::canCastle(std::array<int, 2> move) {
 	if (!this->hasMoved()) {
-		if (move[0] == 4 && !m_currentBoard->inSpace({ 7, (int)(3.5 - 3.5*m_color) })->hasMoved()) {
+		if (move[0] == 6 && !(m_currentBoard->inSpace({ 7, (int)(3.5 - 3.5*m_color) })->hasMoved())) {
 			if (!m_currentBoard->inSpace({ 5, (int)(3.5 - 3.5*m_color) })->getColor() && !m_currentBoard->inSpace({ 6, (int)(3.5 - 3.5*m_color) })->getColor()) {
 				for (int i = 0; i < 2; i++) {
 					if (m_currentBoard->inCheckCheck({ 4 + i, (int)(3.5 - 3.5*m_color) }))
