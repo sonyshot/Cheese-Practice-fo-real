@@ -42,7 +42,7 @@ bool Pawn::canPromote(std::array<int, 2> move) {
 
 bool Pawn::canEnPassant(std::array<int, 2> move) {
 	//if piece on either side is a pawn and the previous move was two squares in length and ended on the square adjacent
-	if (m_currentBoard->inSpace({ move[0], move[1] - m_color })->getName() == "" && m_currentBoard->previousMove()[0] == std::array<int, 2> {move[0], move[1] + m_color} && m_currentBoard->previousMove()[1] == std::array<int, 2> {move[0], move[1] - m_color})
+	if (m_currentBoard->inSpace({ move[0], m_position[1] })->getName() == "" && m_currentBoard->previousMove()[0] == std::array<int, 2> {move[0], move[1] + m_color} && m_currentBoard->previousMove()[1] == std::array<int, 2> {move[0], move[1] - m_color})
 		return true;
 	else
 		return false;
@@ -271,6 +271,7 @@ EmptySquare::EmptySquare(int size, int file, int rank, int color, const sf::Text
 	m_position = { file, rank };
 	m_color = 0;
 	m_currentBoard = board;
+	m_name = "S";
 };
 
 bool EmptySquare::legalMove(std::array<int, 2> move) {

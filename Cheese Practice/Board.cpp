@@ -119,10 +119,9 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 //see above
 
 bool Board::inCheckCheck(std::array<int, 2> kingPos) {
+	//use undoMove function to revert a move that leaves king in check
 	for (int i = 0; i < 64; i++) {
 		if (m_squares[i]->getColor() == -1 * turn && m_squares[i]->legalMove(kingPos)) {
-			//something is happening here when the loop gets to black's pawns
-			//it checks for legal move with blacks king and pushes the inSpace call out of array bounds
 			return true;
 		}
 	};
@@ -131,11 +130,12 @@ bool Board::inCheckCheck(std::array<int, 2> kingPos) {
 
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	Piece * ppiece = this->inSpace(currentPos);
-	if (ppiece->getColor() == turn && ppiece->legalMove(newPos) && !(this->inCheckCheck((turn == 1) ?( m_blackKingPos) : (m_whiteKingPos)))) {
+	if (ppiece->getColor() == turn && ppiece->legalMove(newPos) && !(this->inCheckCheck((turn == 1) ?( m_whiteKingPos) : (m_blackKingPos)))) {
 		//for some reason, as soon as ^this legalMove returns a value, it breaks all the textures in board's m_square array
 		//i'll try changing it to take board pointers instead of board objects
 		if (ppiece->canCastle(newPos)) {
 			m_movelist.push_back({ currentPos, newPos });
+			//add undo components
 			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 1)));
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = ppiece;
@@ -159,6 +159,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		}
 		else if (ppiece->canPromote(newPos)) {
 			m_movelist.push_back({ currentPos, newPos });
+			//add undo components
 			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 2)));
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			delete m_squares[currentPos[0] + 8 * currentPos[1]];
@@ -170,6 +171,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		}
 		else if (ppiece->canEnPassant(newPos)) {
 			m_movelist.push_back({ currentPos, newPos });
+			//add undo components
 			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 3)));
 			ppiece->move(newPos);
 			delete m_squares[newPos[0] + 8 * (newPos[1] - turn)];
@@ -183,6 +185,8 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		}
 		else {
 			m_movelist.push_back({ currentPos, newPos });
+			m_captureList.push_back(this->inSpace(newPos)->getName());
+			m_capturePosList.push_back(newPos);
 			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 0)));
 			ppiece->move(newPos);
 			delete m_squares[newPos[0] + 8 * newPos[1]];
@@ -204,8 +208,45 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 	};
 };
 
-void Board::removePiece(std::array<int, 2> currentPos) {
-	delete m_squares[currentPos[0] + 8 * currentPos[1]];
+Piece * Board::recreatePiece(int file, int rank, int color, std::string identifier) {
+	if (identifier == "") {
+		Piece * ppiece = new Pawn(100, file, rank, color, m_pawnTexture, this);
+		return ppiece;
+	}
+	else if (identifier == "N") {
+		Piece * ppiece = new Knight(100, file, rank, color, m_knightTexture, this);
+		return ppiece;
+	}
+	else if (identifier == "B") {
+		Piece * ppiece = new Bishop(100, file, rank, color, m_bishopTexture, this);
+		return ppiece;
+	}
+	else if (identifier == "R") {
+		Piece * ppiece = new Rook(100, file, rank, color, m_rookTexture, this);
+		return ppiece;
+	}
+	else if (identifier == "Q") {
+		Piece * ppiece = new Queen(100, file, rank, color, m_queenTexture, this);
+		return ppiece;
+	}
+	else if (identifier == "S") {
+		Piece * ppiece = new EmptySquare(100, file, rank, color, m_kingTexture, this);
+		return ppiece;
+	}
+	else {
+		std::cout << "error creating piece with recreatepiece(), please exit to ensure no memory leakage" << std::endl;
+	}
+}
+
+void Board::undoMove() {
+	//capturePosList may not be needed if undo can distinguish special moves
+	delete m_squares[m_movelist.back()[0][0] + 8 * m_movelist.back()[0][1]];
+	m_squares[m_movelist.back()[0][0] + 8 * m_movelist.back()[0][1]] = m_squares[m_movelist.back()[1][0] + 8 * m_movelist.back()[1][1]];
+	m_squares[m_movelist.back()[1][0] + 8 * m_movelist.back()[1][1]] = recreatePiece(m_capturePosList.back()[0], m_capturePosList.back()[1], -1 * turn, m_captureList.back());
+	m_movelist.pop_back();
+	m_captureList.pop_back();
+	m_capturePosList.pop_back();
+	turn = -1 * turn;
 };
 
 Piece* Board::inSpace(std::array<int, 2> position) {
@@ -213,17 +254,6 @@ Piece* Board::inSpace(std::array<int, 2> position) {
 };
 
 std::array<std::array<int, 2>, 2> Board::previousMove() {
-	return (m_movelist.size() == 0) ? (std::array<std::array<int, 2>, 2> { std::array<int, 2> {0, 0}, std::array<int, 2> {0, 0}}) : (m_movelist[m_movelist.size() - 1]);
+	return (m_movelist.size() == 0) ? (std::array<std::array<int, 2>, 2> { std::array<int, 2> {0, 0}, std::array<int, 2> {0, 0}}) : (m_movelist.back());
 };
 
-/*
-Board update loop?
-Things to implement
-- turns *DONE*
-- drawing the objects (should Board handle that and draw all of the pieces too?) *DONE*
--- will looping through all squares be too slow?
-- checkmate checker
-- stalemate checker
-- seeing movelist
-
-*/

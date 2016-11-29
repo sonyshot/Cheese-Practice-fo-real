@@ -49,3 +49,19 @@ int main()
 
 	return 0;
 };
+
+/*
+Board update loop?
+Things to implement
+- turns *DONE*
+- drawing the objects (should Board handle that and draw all of the pieces too?) *DONE*
+-- will looping through all squares be too slow?
+- checkmate checker
+- stalemate checker
+- seeing movelist /in progress/
+- undo button /in progress/
+-- will need special considerations for special moves
+- go through and remove this->inspace in this file (maybe not, we'll see)
+- *this* inside class functions is apparently unneccessary, clean it up!
+
+*/

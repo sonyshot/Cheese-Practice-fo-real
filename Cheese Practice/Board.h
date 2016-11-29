@@ -23,13 +23,20 @@ class Board : public sf::Drawable {
 	sf::Texture * m_kingTexture = &kingTexture;
 
 	sf::Sprite m_sprite;
+
 	std::array<Piece*, 64> m_squares = {};
+
 	std::array<int, 2> m_whiteKingPos;
 	std::array<int, 2> m_blackKingPos;
+
 	std::vector<std::array<std::array<int, 2>, 2>> m_movelist;
+	std::vector<std::string> m_captureList;
+	std::vector<std::array<int, 2>> m_capturePosList;
+
 	std::string m_printMoves = "Movelist:";
 	sf::Font m_font;
 	sf::Text m_text;
+
 	int turn = 1;
 public:
 	//constructor(s) here?
@@ -48,8 +55,10 @@ public:
 	bool inCheckCheck(std::array<int, 2> kingPos);
 
 	void movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos);
+	
+	void undoMove();
 
-	void removePiece(std::array<int, 2> currentPos);
+	Piece * recreatePiece(int file, int rank, int color, std::string identifier);
 
 	Piece* inSpace(std::array<int, 2> position);
 
