@@ -63,4 +63,10 @@ public:
 	Piece* inSpace(std::array<int, 2> position);
 
 	std::array<std::array<int, 2>, 2> previousMove();
+
+	std::string movelistToString(std::array<std::array<int, 2>, 2> move, Piece * piece, int specialMove, bool capture);
+
+	std::string gridToNotate(std::array<int, 2> location, int specialMove);
+
+	std::string gridNotation(std::array<int, 2> grid);
 };

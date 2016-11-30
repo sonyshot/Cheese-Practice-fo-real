@@ -25,7 +25,11 @@ int main()
 
 				// key pressed
 			case sf::Event::MouseButtonPressed:
-				if (selectionFlag == 0) {
+				if (event.mouseButton.x > 800 && event.mouseButton.y < 100) {
+					board.undoMove();
+					std::cout << "move undone" << std::endl;
+				}
+				else if (selectionFlag == 0) {
 					clicky = { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 };
 					selectionFlag = 1;
 					std::cout << "Piece selected position x: " << clicky[0] << " y: " << clicky[1] << std::endl;
@@ -59,7 +63,7 @@ Things to implement
 - checkmate checker
 - stalemate checker
 - seeing movelist /in progress/
-- undo button /in progress/
+- undo button /in progress/ (functions exactly right, UI for it isnt implemented)
 -- will need special considerations for special moves
 - go through and remove this->inspace in this file (maybe not, we'll see)
 - *this* inside class functions is apparently unneccessary, clean it up!

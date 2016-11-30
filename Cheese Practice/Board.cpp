@@ -129,14 +129,14 @@ bool Board::inCheckCheck(std::array<int, 2> kingPos) {
 };
 
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
-	Piece * ppiece = this->inSpace(currentPos);
-	if (ppiece->getColor() == turn && ppiece->legalMove(newPos) && !(this->inCheckCheck((turn == 1) ?( m_whiteKingPos) : (m_blackKingPos)))) {
+	Piece * ppiece = inSpace(currentPos);
+	if (ppiece->getColor() == turn && ppiece->legalMove(newPos)) {
 		//for some reason, as soon as ^this legalMove returns a value, it breaks all the textures in board's m_square array
 		//i'll try changing it to take board pointers instead of board objects
 		if (ppiece->canCastle(newPos)) {
 			m_movelist.push_back({ currentPos, newPos });
 			//add undo components
-			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 1)));
+			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, ppiece, 1, 0)));
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = ppiece;
 			ppiece->move(newPos);
@@ -149,7 +149,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			}
 			else {
 				delete m_squares[3 + 8 * newPos[1]];
-				m_squares[8 * newPos[1]]->move({ 0, newPos[1] });
+				m_squares[8 * newPos[1]]->move({ 3, newPos[1] });
 				m_squares[3 + 8 * newPos[1]] = m_squares[8 * currentPos[1]];
 				m_squares[8 * currentPos[1]] = new EmptySquare(0, 0, newPos[1], 0, m_kingTexture, this);
 			}
@@ -160,9 +160,10 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		else if (ppiece->canPromote(newPos)) {
 			m_movelist.push_back({ currentPos, newPos });
 			//add undo components
-			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 2)));
+			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, ppiece, 2, (inSpace(newPos)->getColor() == 0) ? 0 : 1)));
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			delete m_squares[currentPos[0] + 8 * currentPos[1]];
+			//always gives queens atm
 			m_squares[newPos[0] + 8 * newPos[1]] = new Queen(100, newPos[0], newPos[1], turn, m_queenTexture, this);
 			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
 			std::cout << "pawn promoted" << std::endl;
@@ -172,7 +173,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		else if (ppiece->canEnPassant(newPos)) {
 			m_movelist.push_back({ currentPos, newPos });
 			//add undo components
-			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 3)));
+			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, ppiece, 3, (inSpace(newPos)->getColor() == 0) ? 0 : 1)));
 			ppiece->move(newPos);
 			delete m_squares[newPos[0] + 8 * (newPos[1] - turn)];
 			m_squares[newPos[0] + 8 * (newPos[1] - 1)] = new EmptySquare(0, newPos[0], newPos[1] - turn, 0, m_kingTexture, this);
@@ -185,9 +186,9 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		}
 		else {
 			m_movelist.push_back({ currentPos, newPos });
-			m_captureList.push_back(this->inSpace(newPos)->getName());
+			m_captureList.push_back(inSpace(newPos)->getName());
 			m_capturePosList.push_back(newPos);
-			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, this->inSpace(currentPos), 0)));
+			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, ppiece, 0, (inSpace(newPos)->getColor() == 0) ? 0 : 1)));
 			ppiece->move(newPos);
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
@@ -199,6 +200,12 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			}
 			else if (currentPos == m_blackKingPos) {
 				m_blackKingPos = newPos;
+			}
+			if (inCheckCheck(turn == 1 ? m_whiteKingPos : m_blackKingPos)) {
+				turn = -1 * turn;
+				undoMove();
+				turn = -1 * turn;
+				std::cout << "still in check!" << std::endl;
 			}
 			turn = -1 * turn;
 		}
@@ -230,7 +237,7 @@ Piece * Board::recreatePiece(int file, int rank, int color, std::string identifi
 		return ppiece;
 	}
 	else if (identifier == "S") {
-		Piece * ppiece = new EmptySquare(100, file, rank, color, m_kingTexture, this);
+		Piece * ppiece = new EmptySquare(0, file, rank, color, m_kingTexture, this);
 		return ppiece;
 	}
 	else {
@@ -239,14 +246,18 @@ Piece * Board::recreatePiece(int file, int rank, int color, std::string identifi
 }
 
 void Board::undoMove() {
-	//capturePosList may not be needed if undo can distinguish special moves
+	//capturePosList may not be needed if undo can distinguish between special moves
 	delete m_squares[m_movelist.back()[0][0] + 8 * m_movelist.back()[0][1]];
+	m_squares[m_movelist.back()[1][0] + 8 * m_movelist.back()[1][1]]->move(m_movelist.back()[0]);
 	m_squares[m_movelist.back()[0][0] + 8 * m_movelist.back()[0][1]] = m_squares[m_movelist.back()[1][0] + 8 * m_movelist.back()[1][1]];
-	m_squares[m_movelist.back()[1][0] + 8 * m_movelist.back()[1][1]] = recreatePiece(m_capturePosList.back()[0], m_capturePosList.back()[1], -1 * turn, m_captureList.back());
+	m_squares[m_movelist.back()[1][0] + 8 * m_movelist.back()[1][1]] = recreatePiece(m_capturePosList.back()[0], m_capturePosList.back()[1], turn, m_captureList.back());
 	m_movelist.pop_back();
 	m_captureList.pop_back();
 	m_capturePosList.pop_back();
 	turn = -1 * turn;
+	std::size_t found = m_printMoves.find_last_of("-\n");
+	m_printMoves.erase(found, m_printMoves.length() - found);
+	m_text.setString(m_printMoves);
 };
 
 Piece* Board::inSpace(std::array<int, 2> position) {
@@ -257,3 +268,124 @@ std::array<std::array<int, 2>, 2> Board::previousMove() {
 	return (m_movelist.size() == 0) ? (std::array<std::array<int, 2>, 2> { std::array<int, 2> {0, 0}, std::array<int, 2> {0, 0}}) : (m_movelist.back());
 };
 
+std::string Board::movelistToString(std::array<std::array<int, 2>, 2> move, Piece * piece, int specialMove, bool capture) {
+	std::string output;
+	if (!specialMove) {
+		if (piece->getColor() == 1) 
+			output = "\n";
+		else 
+			output = "-";
+
+		if (capture) {
+			if (piece->getName() == "")
+				output.append(gridNotation(move[0]).substr(0, 1));
+			else
+				output.append(piece->getName());
+
+			output.append("x");
+		}
+		else {
+			output.append(piece->getName());
+		}
+		output.append(gridToNotate(move[1], specialMove));
+		return output;
+	}
+	else if (specialMove == 1) {
+		//castle--------------------------------------------------------------
+		if (piece->getColor() == 1)
+			output = "\n";
+		else
+			output = "-";
+
+		output.append(gridToNotate(move[1], specialMove));
+		return output;
+	}
+	else if (specialMove == 2) {
+		//promotion------------------------------------------------------------
+		if (piece->getColor() == 1) 
+			output = "\n";
+		else 
+			output = "-";
+
+		if (capture)
+			output.append(gridNotation(move[0]).substr(0, 1) + "x");
+
+		output.append(gridToNotate(move[1], specialMove));
+		return output;
+	}
+	else if (specialMove == 3) {
+		//en passant-----------------------------------------------------------
+		if (piece->getColor() == 1)
+			output = "\n";
+		else
+			output = "-";
+		output.append(gridNotation(move[0]).substr(0, 1));
+		output.append("x");
+		output.append(gridToNotate(move[1], specialMove));
+		
+		return output;
+	}
+};
+
+std::string Board::gridToNotate(std::array<int, 2> grid, int specialMove) {
+	std::string output;
+	if (!specialMove) {
+		output.append(gridNotation(grid));
+		return output;
+	}
+	else if (specialMove == 1) {
+		//castle
+		if (grid[0] == 6) {
+			output.append("0-0");
+			return output;
+		}
+		else {
+			output.append("0-0-0");
+			return output;
+		}
+	}
+	else if (specialMove == 2) {
+		//promotion
+		output.append("=Q");
+		return output;
+	}
+	else {
+		//en passant
+		output.append(gridNotation(grid));
+		output.append(" e.p.");
+		return output;
+	}
+};
+
+std::string Board::gridNotation(std::array<int, 2> grid) {
+	std::string output;
+
+	switch (grid[0]) {
+	case 0:
+		output.append("a");
+		break;
+	case 1:
+		output.append("b");
+		break;
+	case 2:
+		output.append("c");
+		break;
+	case 3:
+		output.append("d");
+		break;
+	case 4:
+		output.append("e");
+		break;
+	case 5:
+		output.append("f");
+		break;
+	case 6:
+		output.append("g");
+		break;
+	case 7:
+		output.append("h");
+		break;
+	};
+	output.append(std::to_string(grid[1] + 1));
+	return output;
+}

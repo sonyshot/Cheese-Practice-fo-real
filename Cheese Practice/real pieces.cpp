@@ -5,7 +5,7 @@
 Pawn::Pawn(int size, int file, int rank, int color, sf::Texture * texture, Board * board) :Piece(size, file, rank, color, texture, board, "") {};
 
 bool Pawn::legalMove(std::array<int, 2> move) {
-	if (this->canEnPassant(move))
+	if (canEnPassant(move))
 		return true;
 	std::array<int, 2> inBetween;
 	inBetween[0] = move[0];
@@ -207,7 +207,7 @@ King::King(int size, int file, int rank, int color, sf::Texture * texture, Board
 };
 
 bool King::legalMove(std::array<int, 2> move) {
-	if (this->canCastle(move))
+	if (canCastle(move))
 		return true;
 	else if ((abs(move[0] - m_position[0]) <= 1) && (abs(move[1] - m_position[1]) <= 1)) {
 		if (!(m_currentBoard->inSpace(move)->getColor() - m_color))
