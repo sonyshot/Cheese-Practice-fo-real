@@ -1,12 +1,46 @@
-#include <iostream>
-#include <array>
 #include "Board.h"
 #include "real pieces.h"
 #include "array conversion therapy.h"
 
+//buffer board constructor
+Board::Board() {
+	for (int i = 0; i < 8; i++) {//create pawns on the board
+		m_squares[8 + i] = new Pawn(0, i, 1, 1, m_pawnTexture, this);
+		std::cout << "white pawn " << i << " created at (" << i << ", " << 1 << ")" << std::endl;
+		m_squares[48 + i] = new Pawn(0, i, 6, -1, m_pawnTexture, this);
+	};
+	for (int i = 0; i < 2; i++) {
+		//knights
+		m_squares[1 + i * 5] = new Knight(0, 1 + 5 * i, 0, 1, m_knightTexture, this);
+		std::cout << "white knight " << i << " created at (" << (1 + 5 * i) << ", " << 0 << ")" << std::endl;
+		m_squares[57 + i * 5] = new Knight(0, 1 + 5 * i, 7, -1, m_knightTexture, this);
+		//bishops
+		m_squares[2 + i * 3] = new Bishop(0, 2 + 3 * i, 0, 1, m_bishopTexture, this);
+		m_squares[58 + i * 3] = new Bishop(0, 2 + 3 * i, 7, -1, m_bishopTexture, this);
+		//rooks
+		m_squares[7 * i] = new Rook(0, 7 * i, 0, 1, m_rookTexture, this);
+		m_squares[56 + 7 * i] = new Rook(0, 7 * i, 7, -1, m_rookTexture, this);
+	};
+	for (int i = 0; i < 1; i++) {
+		//queens
+		m_squares[3] = new Queen(0, 3, 0, 1, m_queenTexture, this);
+		m_squares[59] = new Queen(0, 3, 7, -1, m_queenTexture, this);
+		//kings
+		m_whiteKingPos = { 4, 0 };
+		m_blackKingPos = { 4, 7 };
+		m_squares[4] = new King(0, 4, 0, 1, m_kingTexture, this);
+		m_squares[60] = new King(0, 4, 7, -1, m_kingTexture, this);
+	};
 
-Board::Board(int size) {
+	for (int i = 0; i < 32; i++) {//fill the rest of the board with empty squares
+		m_squares[16 + i] = new EmptySquare(100, i % 8, 2 + i / 8, 0, m_kingTexture, this);
+	};
+};
+
+Board::Board(int size, Board * bufferBoard) {
 	//size should be a multiple of 8, not sure how it will draw otherwise
+	m_buffer = bufferBoard;
+
 	sf::Image blackSquare;
 	blackSquare.create(size / 8, size / 8, sf::Color(50, 50, 50, 255));
 	sf::Image whiteSquare;
@@ -118,19 +152,21 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 };
 //see above
 
-bool Board::inCheckCheck(std::array<int, 2> kingPos) {
+//note this can't be used with buffer boards
+std::vector<Piece*> Board::inCheckCheck() {
 	//use undoMove function to revert a move that leaves king in check
+	std::vector<Piece*> output;
 	for (int i = 0; i < 64; i++) {
-		if (m_squares[i]->getColor() == -1 * turn && m_squares[i]->legalMove(kingPos)) {
-			return true;
+		if (m_squares[i]->getColor() == -1 * turn && m_squares[i]->legalMove(turn == 1?m_whiteKingPos:m_blackKingPos, m_buffer)) {
+			output.push_back(m_squares[i]);
 		}
 	};
-	return false;
+	return output;
 };
 
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	Piece * ppiece = inSpace(currentPos);
-	if (ppiece->getColor() == turn && ppiece->legalMove(newPos)) {
+	if (ppiece->getColor() == turn) {
 		//for some reason, as soon as ^this legalMove returns a value, it breaks all the textures in board's m_square array
 		//i'll try changing it to take board pointers instead of board objects
 		if (ppiece->canCastle(newPos)) {
@@ -201,19 +237,30 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			else if (currentPos == m_blackKingPos) {
 				m_blackKingPos = newPos;
 			}
-			if (inCheckCheck(turn == 1 ? m_whiteKingPos : m_blackKingPos)) {
-				turn = -1 * turn;
-				undoMove();
-				turn = -1 * turn;
-				std::cout << "still in check!" << std::endl;
-			}
 			turn = -1 * turn;
+			if (m_buffer != NULL) {
+				std::vector<Piece*> checkingPieces = inCheckCheck();
+				if (checkingPieces.size() != 0) {
+					if (checkmateCheck((turn == 1) ? m_whiteKingPos : m_blackKingPos, checkingPieces))
+						std::cout << "Checkmate!" << std::endl;
+				}
+			}
 		}
 	}
 	else {
 		std::cout << "Invalid Move!" << std::endl;
 	};
 };
+
+//note this function can't be used with a buffer board itself
+void Board::validMove(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
+	if (inSpace(currentPos)->legalMove(newPos, m_buffer)) {
+		movePiece(currentPos, newPos);
+	}
+	else {
+		std::cout << "invalid move" << std::endl;
+	}
+}
 
 Piece * Board::recreatePiece(int file, int rank, int color, std::string identifier) {
 	if (identifier == "") {
@@ -389,3 +436,127 @@ std::string Board::gridNotation(std::array<int, 2> grid) {
 	output.append(std::to_string(grid[1] + 1));
 	return output;
 }
+
+std::array<int, 2> Board::kingPosition(int color) {
+	if (color == 1)
+		return m_whiteKingPos;
+	else
+		return m_blackKingPos;
+};
+
+bool Board::coveredSquare(std::array<int, 2> testPos, int color) {
+	int posX = 7 - testPos[0];
+	int negX = testPos[0];
+	int posY = 7 - testPos[1];
+	int negY = testPos[1];
+//check diagonals
+	for (int i = 1; i <= std::min(posX, posY); i++) {
+		if (inSpace({ negX + i, negY + i })->getColor() == color && (inSpace({ negX + i, negY + i })->getName() == "B" || inSpace({ negX + i, negY + i })->getName() == "Q"))
+			return true;
+	}
+	for (int i = 1; i <= std::min(negX, posY); i++) {
+		if (inSpace({ negX - i, negY + i })->getColor() == color && (inSpace({ negX - i, negY + i })->getName() == "B" || inSpace({ negX - i, negY + i })->getName() == "Q"))
+			return true;
+	}
+	for (int i = 1; i <= std::min(negX, negY); i++) {
+		if (inSpace({ negX - i, negY - i })->getColor() == color && (inSpace({ negX - i, negY - i })->getName() == "B" || inSpace({ negX - i, negY - i })->getName() == "Q"))
+			return true;
+	}
+	for (int i = 1; i <= std::min(posX, negY); i++) {
+		if (inSpace({ negX + i, negY - i })->getColor() == color && (inSpace({ negX + i, negY - i })->getName() == "B" || inSpace({ negX + i, negY - i })->getName() == "Q"))
+			return true;
+	}
+//check horizontals
+	for (int i = 1; i <= posX; i++) {
+		if (inSpace({ negX + i, negY})->getColor() == color && (inSpace({ negX + i, negY})->getName() == "R" || inSpace({ negX + i, negY })->getName() == "Q"))
+			return true;
+	}
+	for (int i = 1; i <= posY; i++) {
+		if (inSpace({ negX, negY + i })->getColor() == color && (inSpace({ negX, negY + i })->getName() == "R" || inSpace({ negX, negY + i })->getName() == "Q"))
+			return true;
+	}
+	for (int i = 1; i <= negX; i++) {
+		if (inSpace({ negX - i, negY})->getColor() == color && (inSpace({ negX - i, negY })->getName() == "R" || inSpace({ negX - i, negY })->getName() == "Q"))
+			return true;
+	}
+	for (int i = 1; i <= negY; i++) {
+		if (inSpace({ negX , negY - i })->getColor() == color && (inSpace({ negX , negY - i })->getName() == "R" || inSpace({ negX , negY - i })->getName() == "Q"))
+			return true;
+	}
+//check knights
+	for (int i = 1; i < 12; i++) {
+		if (i % 3 != 0) {
+			int testX = (int)(negX + 2.23607*cos(i*3.1415926 / 6.0) + 0.5);
+			int testY = (int)(negY + 2.23607*sin(i*3.1415926 / 6.0) + 0.5);
+			if ((testX < 8 && testX>0) && (testY < 8 && testY>0)) {
+				if (inSpace({ testX, testY })->getColor() == color && inSpace({ testX, testY })->getName() == "N")
+					return true;
+			}
+		}
+	}
+//check pawns (maybe wrap into diagonals?)
+
+	return false;
+};
+
+//note this function can't be used with a buffer board itself
+bool Board::checkmateCheck(std::array<int, 2> kingPos, std::vector<Piece*> checkingPieces) {
+	//three ways to get out of check
+	//1. move the king
+	for (int i = -1; i < 2; i++) {
+		for (int j = -1; j < 2; j++) {
+			if (!!i || !!j) {
+				int testX = kingPos[0] + i;
+				int testY = kingPos[1] + j;
+				if ((testX >= 0 && testX <= 7) && (testY >= 0 && testY <= 7)) {
+					if (inSpace(kingPos)->legalMove({ testX, testY }, m_buffer)) {
+						if (!coveredSquare({ testX, testY }, turn))
+							return false;
+					}
+				}
+			}
+		}
+	}
+	//2. capture the checking piece
+	if (checkingPieces.size() == 1) {
+		for (int i = 0; i < 64; i++) {
+			if (m_squares[i]->getColor() == -1 * (inSpace(kingPos)->getColor()) && m_squares[i]->legalMove(checkingPieces[0]->getPosition(), m_buffer))
+				return false;
+		}
+	}
+	//3. move in between the checking piece and the king
+	if (checkingPieces.size() == 1) {
+		if ((checkingPieces[0]->getName() != "N") && (checkingPieces[0]->getName() != "")) {
+			std::array<int, 2> checkingPiecePos = checkingPieces[0]->getPosition();
+			if (checkingPiecePos[0] == kingPos[0]) {
+				int diff = abs(checkingPiecePos[1] - kingPos[1]);
+				if (diff > 1) {
+					int sign = (checkingPiecePos[1] - kingPos[1]) / diff;
+					for (int i = 1; i < diff; i++) {
+						if (checkingPieces[0]->legalMove({ checkingPiecePos[0], checkingPiecePos[1] + i*sign }, m_buffer))
+							return false;
+					}
+				}
+			} else if (checkingPiecePos[1] == kingPos[1]) {
+				int diff = abs(checkingPiecePos[0] - kingPos[0]);
+				if (diff > 1) {
+					int sign = (checkingPiecePos[0] - kingPos[0]) / diff;
+					for (int i = 1; i < diff; i++) {
+						if (checkingPieces[0]->legalMove({ checkingPiecePos[0] + i*sign, checkingPiecePos[1] }, m_buffer))
+							return false;
+					}
+				}
+			} else {
+				int diff = abs(checkingPiecePos[1] - kingPos[1]);
+				if (diff > 1) {
+					int sign = (checkingPiecePos[1] - kingPos[1]) / diff;
+					for (int i = 1; i < diff; i++) {
+						if (checkingPieces[0]->legalMove({ checkingPiecePos[0] + i*sign, checkingPiecePos[1] + i*sign }, m_buffer))
+							return false;
+					}
+				}
+			}
+		}
+	}
+	return true;
+};

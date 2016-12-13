@@ -3,9 +3,13 @@
 #include <iostream>
 #include <array>
 #include <string>
+#include <math.h>
+#include <algorithm>
 #include "Piece.h"
 
 class Board : public sf::Drawable {
+	Board * m_buffer;
+
 	sf::Texture m_boardTexture;
 
 	sf::Texture pawnTexture;
@@ -40,8 +44,10 @@ class Board : public sf::Drawable {
 	int turn = 1;
 public:
 	//constructor(s) here?
+
+	Board();
 	//this uses 'new' to create piece objects that wont get deleted outside the constructor necessitating 'delete' in the destructor
-	Board(int size);
+	Board(int size, Board * bufferBoard);
 	//plz use multiple of 8 for board creation
 
 	Board(int size, std::array<Piece*, 64> squares, std::array<int, 2> whiteKingPos, std::array<int, 2> blackKingPos);
@@ -52,11 +58,19 @@ public:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	//see above
 
-	bool inCheckCheck(std::array<int, 2> kingPos);
+	std::vector<Piece*> inCheckCheck();
+
+	bool checkmateCheck(std::array<int, 2> testPos, std::vector<Piece*> checkingPieces);
 
 	void movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos);
+
+	void validMove(std::array<int, 2> currentPos, std::array<int, 2> newPos);
 	
 	void undoMove();
+
+	bool coveredSquare(std::array<int, 2> testPos, int color);
+
+	std::array<int, 2> kingPosition(int color);
 
 	Piece * recreatePiece(int file, int rank, int color, std::string identifier);
 

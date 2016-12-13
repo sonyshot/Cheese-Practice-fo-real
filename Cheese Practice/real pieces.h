@@ -7,7 +7,7 @@ class Pawn : public Piece{
 public:
 	Pawn(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
 
 	bool canPromote(std::array<int, 2> move);
 
@@ -24,7 +24,7 @@ class Knight : public Piece{
 public:
 	Knight::Knight(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -37,7 +37,7 @@ class Bishop : public Piece {
 public:
 	Bishop::Bishop(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -50,7 +50,7 @@ class Rook : public Piece{
 public:
 	Rook::Rook(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -64,7 +64,7 @@ class Queen : public Piece {
 public:
 	Queen::Queen(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -77,7 +77,7 @@ class King : public Piece {
 public:
 	King::King(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
-	bool legalMove(std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
 
 	bool canCastle(std::array<int, 2> move);
 
@@ -96,7 +96,7 @@ public:
 
 	EmptySquare(int size, int file, int rank, int color, const sf::Texture * texture, Board * board);
 
-	bool legalMove(std::array<int, 2> move);
+	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;

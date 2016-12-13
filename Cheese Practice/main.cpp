@@ -7,7 +7,9 @@
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1000, 800), "board drawing test");
-	Board board(800);
+	Board bBuffer;
+	Board * buffer = &bBuffer;
+	Board board(800, buffer);
 	std::array<int, 2> clicky;
 	int selectionFlag = 0;
 
@@ -35,7 +37,8 @@ int main()
 					std::cout << "Piece selected position x: " << clicky[0] << " y: " << clicky[1] << std::endl;
 				}
 				else {
-					board.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
+					board.validMove(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
+					buffer->movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
 					selectionFlag = 0;
 				}
 				break;
