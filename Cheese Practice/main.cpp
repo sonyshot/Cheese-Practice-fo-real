@@ -4,6 +4,7 @@
 #include "real pieces.h"
 
 //copy pasta'd window loop from sfml website
+
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1000, 800), "board drawing test");
@@ -38,7 +39,6 @@ int main()
 				}
 				else {
 					board.validMove(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
-					buffer->movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
 					selectionFlag = 0;
 				}
 				break;
@@ -71,4 +71,56 @@ Things to implement
 - go through and remove this->inspace in this file (maybe not, we'll see)
 - *this* inside class functions is apparently unneccessary, clean it up!
 
+*/
+/*
+#include <SFML\Graphics.hpp>
+#include <iostream>
+
+
+int main() {
+	sf::RenderWindow window(sf::VideoMode(1200, 800), "Test");
+	sf::RectangleShape rect(sf::Vector2f(32, 32));
+	rect.setFillColor(sf::Color(255, 255, 255));
+	rect.setPosition(sf::Vector2f(600, 400));
+	window.setMouseCursorVisible(false);
+	std::vector<sf::CircleShape> circles;
+	int count = 0;
+	std::srand(std::time(0));
+
+	while (window.isOpen()) {
+
+		sf::Event event;
+
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) {
+				window.close();
+			}
+			if (event.type == sf::Event::MouseMoved) {
+				rect.setPosition(event.mouseMove.x, event.mouseMove.y);
+			}
+		}
+		count++;
+		if (count > 100) {
+			
+			int x = std::rand() % 1200;
+			int y = std::rand() % 800;
+			std::cout << "x: " << x << " y: " << y << std::endl;
+			sf::CircleShape circle;
+			circle.setRadius(16);
+			circle.setFillColor(sf::Color(255, 255, 255));
+			circle.setPosition(sf::Vector2f(x, y));
+			circles.push_back(circle);
+			count = 0;
+		}
+
+		window.clear();
+		window.draw(rect);
+		for (int i = 0; i < circles.size(); i++) {
+			window.draw(circles[i]);
+		}
+		window.display();
+	}
+
+	return 0;
+}
 */

@@ -5,9 +5,12 @@
 Pawn::Pawn(int size, int file, int rank, int color, sf::Texture * texture, Board * board) :Piece(size, file, rank, color, texture, board, "") {};
 
 bool Pawn::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (move == m_position)
+		return false;
+
 	if (bufferBoard != NULL) {
 		bufferBoard->movePiece(m_position, move);
-		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(getColor()), -1*getColor())) {
+		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(m_color), -1 * m_color).size() != 0) {
 			bufferBoard->undoMove();
 			return false;
 		}
@@ -32,7 +35,7 @@ bool Pawn::legalMove(std::array<int, 2> move, Board * bufferBoard) {
 	else if (m_position[1] == 3.5 - m_color*2.5 && m_position[0] == move[0] && move[1] == m_position[1] + m_color*2 && !(m_currentBoard->inSpace(move)->getColor()) && !(m_currentBoard->inSpace(inBetween)->getColor())) {
 		return true;
 	}
-	else {
+	 else {
 		return false;
 	};
 };
@@ -62,9 +65,12 @@ Knight::Knight(int size, int file, int rank, int color, sf::Texture * texture, B
 };
 
 bool Knight::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (move == m_position)
+		return false;
+
 	if (bufferBoard != NULL) {
 		bufferBoard->movePiece(m_position, move);
-		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(getColor()), -1 * getColor())) {
+		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(m_color), -1 * m_color).size() != 0) {
 			bufferBoard->undoMove();
 			return false;
 		}
@@ -93,9 +99,12 @@ Bishop::Bishop(int size, int file, int rank, int color, sf::Texture * texture, B
 };
 
 bool Bishop::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (move == m_position)
+		return false;
+
 	if (bufferBoard != NULL) {
 		bufferBoard->movePiece(m_position, move);
-		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(getColor()), -1 * getColor())) {
+		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(getColor()), -1 * getColor()).size() != 0) {
 			bufferBoard->undoMove();
 			return false;
 		}
@@ -131,9 +140,12 @@ Rook::Rook(int size, int file, int rank, int color, sf::Texture * texture, Board
 };
 
 bool Rook::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (move == m_position)
+		return false;
+
 	if (bufferBoard != NULL) {
 		bufferBoard->movePiece(m_position, move);
-		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(getColor()), -1 * getColor())) {
+		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(getColor()), -1 * getColor()).size() != 0) {
 			bufferBoard->undoMove();
 			return false;
 		}
@@ -182,9 +194,12 @@ Queen::Queen(int size, int file, int rank, int color, sf::Texture * texture, Boa
 };
 
 bool Queen::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (move == m_position)
+		return false;
+
 	if (bufferBoard != NULL) {
 		bufferBoard->movePiece(m_position, move);
-		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(getColor()), -1 * getColor())) {
+		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(m_color), -1 * m_color).size() != 0) {
 			bufferBoard->undoMove();
 			return false;
 		}
@@ -247,9 +262,12 @@ King::King(int size, int file, int rank, int color, sf::Texture * texture, Board
 };
 
 bool King::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (move == m_position)
+		return false;
+
 	if (bufferBoard != NULL) {
 		bufferBoard->movePiece(m_position, move);
-		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(getColor()), -1 * getColor())) {
+		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(getColor()), -1 * getColor()).size() != 0) {
 			bufferBoard->undoMove();
 			return false;
 		}
@@ -277,7 +295,7 @@ bool King::canCastle(std::array<int, 2> move) {
 		if (move[0] == 6 && !(m_currentBoard->inSpace({ 7, (int)(3.5 - 3.5*m_color) })->hasMoved())) {
 			if (!m_currentBoard->inSpace({ 5, (int)(3.5 - 3.5*m_color) })->getColor() && !m_currentBoard->inSpace({ 6, (int)(3.5 - 3.5*m_color) })->getColor()) {
 				for (int i = 0; i < 2; i++) {
-					if (m_currentBoard->coveredSquare({ 4 + i, (int)(3.5 - 3.5*m_color) }, -1*m_color))
+					if (m_currentBoard->coveredSquare({ 4 + i, (int)(3.5 - 3.5*m_color) }, -1*m_color).size() != 0)
 						return false;
 				};
 				return true;
@@ -288,7 +306,7 @@ bool King::canCastle(std::array<int, 2> move) {
 		else if(move[0] == 2 && !m_currentBoard->inSpace({ 0, (int)(3.5 - 3.5*m_color) })->hasMoved()){
 			if (!m_currentBoard->inSpace({ 1, (int)(3.5 - 3.5*m_color) })->getColor() && !m_currentBoard->inSpace({ 2, (int)(3.5 - 3.5*m_color) })->getColor() && !m_currentBoard->inSpace({ 3, (int)(3.5 - 3.5*m_color) })->getColor()) {
 				for (int i = 0; i < 3; i++) {
-					if (m_currentBoard->coveredSquare({ 1 + i, (int)(3.5 - 3.5*m_color) }, -1*m_color))
+					if (m_currentBoard->coveredSquare({ 1 + i, (int)(3.5 - 3.5*m_color) }, -1*m_color).size() != 0)
 						return false;
 				};
 				return true;

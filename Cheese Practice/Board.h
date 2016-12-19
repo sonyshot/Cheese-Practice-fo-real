@@ -64,11 +64,15 @@ public:
 
 	void movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos);
 
+	void move(std::array<int, 2> currentPos, std::array<int, 2> newPos);
+
+	void updateMoveList(std::array<int, 2> currentPos, std::array<int, 2> newPos);
+
 	void validMove(std::array<int, 2> currentPos, std::array<int, 2> newPos);
 	
 	void undoMove();
 
-	bool coveredSquare(std::array<int, 2> testPos, int color);
+	std::vector<Piece*> coveredSquare(std::array<int, 2> testPos, int color);
 
 	std::array<int, 2> kingPosition(int color);
 
