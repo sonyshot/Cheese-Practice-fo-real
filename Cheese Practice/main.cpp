@@ -13,6 +13,7 @@ int main()
 	Board board(800, buffer);
 	std::array<int, 2> clicky;
 	int selectionFlag = 0;
+	std::cout << sizeof(Board);
 
 	while (window.isOpen())
 	{

@@ -1,6 +1,5 @@
 #include "Board.h"
 #include "real pieces.h"
-#include "array conversion therapy.h"
 
 //buffer board constructor
 Board::Board() {
@@ -41,6 +40,8 @@ Board::Board(int size, Board * bufferBoard) {
 	//size should be a multiple of 8, not sure how it will draw otherwise
 	m_buffer = bufferBoard;
 
+	m_movelist = new Movelist();
+
 	sf::Image blackSquare;
 	blackSquare.create(size / 8, size / 8, sf::Color(50, 50, 50, 255));
 	sf::Image whiteSquare;
@@ -57,14 +58,6 @@ Board::Board(int size, Board * bufferBoard) {
 	};
 
 	m_sprite.setTexture(m_boardTexture);
-
-	if (!m_font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf")) {
-		std::cout << "failed to load font" << std::endl;
-	}
-	m_text.setFont(m_font);
-	m_text.setString(m_printMoves);
-	m_text.setFillColor(sf::Color::White);
-	m_text.setPosition(800.f, 0.f);
 
 	if (!pawnTexture.loadFromFile("pawn.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
@@ -140,6 +133,9 @@ Board::~Board() {
 	for (int i = 0; i < 64; i++) {
 		delete m_squares[i];
 	};
+	delete m_movelist;
+
+
 };
 
 //-------maybe put above in constructor? no need to create a texture every time this is drawn--------
@@ -149,7 +145,6 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	for (int i = 0; i < 64; i++) {
 		target.draw(*m_squares[i], states);
 	};
-	target.draw(m_text, states);
 };
 //see above
 
@@ -188,13 +183,12 @@ void Board::updateMoveList(std::array<int, 2> currentPos, std::array<int, 2> new
 
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	Piece * ppiece = inSpace(currentPos);
+	m_movelist->addToMovelist(currentPos, newPos);
 	if (1) {
 		//for some reason, as soon as ^this legalMove returns a value, it breaks all the textures in board's m_square array
 		//i'll try changing it to take board pointers instead of board objects
 		if (ppiece->canCastle(newPos)) {
-			m_movelist.push_back({ currentPos, newPos });
-			//add undo components
-			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, ppiece, 1, 0)));
+			
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = ppiece;
 			ppiece->move(newPos);
@@ -215,12 +209,8 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 
 			turn = -1 * turn;
 		}
-		else if (0) { //promotion
-			m_movelist.push_back({ currentPos, newPos });
-			m_captureList.push_back(inSpace(newPos)->getName());
-			m_capturePosList.push_back(newPos);
-			//add undo components
-			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, ppiece, 2, (inSpace(newPos)->getColor() == 0) ? 0 : 1)));
+		else if (ppiece->canPromote(newPos)) { //promotion
+
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			delete m_squares[currentPos[0] + 8 * currentPos[1]];
 			//always gives queens atm
@@ -231,11 +221,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			turn = -1 * turn;
 		}
 		else if (ppiece->canEnPassant(newPos)) {
-			m_movelist.push_back({ currentPos, newPos });
-			m_captureList.push_back(inSpace(newPos)->getName());
-			m_capturePosList.push_back(newPos);
-			//add undo components
-			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, ppiece, 3, (inSpace(newPos)->getColor() == 0) ? 0 : 1)));
+
 			ppiece->move(newPos);
 			delete m_squares[newPos[0] + 8 * (newPos[1] - turn)];
 			m_squares[newPos[0] + 8 * (newPos[1] - 1)] = new EmptySquare(0, newPos[0], newPos[1] - turn, 0, m_kingTexture, this);
@@ -247,10 +233,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			turn = -1 * turn;
 		}
 		else {
-			m_movelist.push_back({ currentPos, newPos });
-			m_captureList.push_back(inSpace(newPos)->getName());
-			m_capturePosList.push_back(newPos);
-			m_text.setString(m_printMoves.append(movelistToString({ currentPos, newPos }, ppiece, 0, (inSpace(newPos)->getColor() == 0) ? 0 : 1)));
+
 			ppiece->move(newPos);
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
@@ -291,184 +274,61 @@ void Board::validMove(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 	}
 }
 
-Piece * Board::recreatePiece(int file, int rank, int color, std::string identifier) {
-	if (identifier == "") {
-		Piece * ppiece = new Pawn(100, file, rank, color, m_pawnTexture, this);
-		return ppiece;
-	}
-	else if (identifier == "N") {
-		Piece * ppiece = new Knight(100, file, rank, color, m_knightTexture, this);
-		return ppiece;
-	}
-	else if (identifier == "B") {
-		Piece * ppiece = new Bishop(100, file, rank, color, m_bishopTexture, this);
-		return ppiece;
-	}
-	else if (identifier == "R") {
-		Piece * ppiece = new Rook(100, file, rank, color, m_rookTexture, this);
-		return ppiece;
-	}
-	else if (identifier == "Q") {
-		Piece * ppiece = new Queen(100, file, rank, color, m_queenTexture, this);
-		return ppiece;
-	}
-	else if (identifier == "K") {
-		Piece * ppiece = new King(100, file, rank, color, m_kingTexture, this);
-		return ppiece;
-	}
-	else if (identifier == "S") {
-		Piece * ppiece = new EmptySquare(0, file, rank, color, m_kingTexture, this);
-		return ppiece;
-	}
-	else {
-		std::cout << "error creating piece with recreatepiece(), please exit to ensure no memory leakage" << std::endl;
-	}
-}
-
 void Board::undoMove() {
-	//capturePosList may not be needed if undo can distinguish between special moves
-	delete m_squares[m_movelist.back()[0][0] + 8 * m_movelist.back()[0][1]]; //delete square last move was made from
-	m_squares[m_movelist.back()[1][0] + 8 * m_movelist.back()[1][1]]->move(m_movelist.back()[0]); //change piece position to its old one
-	m_squares[m_movelist.back()[0][0] + 8 * m_movelist.back()[0][1]] = m_squares[m_movelist.back()[1][0] + 8 * m_movelist.back()[1][1]]; //move the pieces pointer back to the old square
-	m_squares[m_movelist.back()[1][0] + 8 * m_movelist.back()[1][1]] = recreatePiece(m_capturePosList.back()[0], m_capturePosList.back()[1], turn, m_captureList.back()); //remake the piece that was captured beforehand
+	
+	std::array<std::array<int, 2>, 2> lastMove = m_movelist->previousMove();
 
-	if (inSpace(m_movelist.back()[0])->getName() == "K") {
-		if (inSpace(m_movelist.back()[0])->getColor() == 1) {
-			m_whiteKingPos = m_movelist.back()[0];
+	delete m_squares[lastMove[0][0] + 8 * lastMove[0][1]]; //delete square last move was made from
+	m_squares[lastMove[1][0] + 8 * lastMove[1][1]]->move(lastMove[0]); //change piece position to its old one
+	m_squares[lastMove[0][0] + 8 * lastMove[0][1]] = m_squares[lastMove[1][0] + 8 * lastMove[1][1]]; //move the pieces pointer back to the old square
+
+	if (m_movelist->m_moveType.back() == 0) {// normal move
+		m_squares[lastMove[1][0] + 8 * lastMove[1][1]] = m_movelist->m_captureList.back();
+	}
+	else if (m_movelist->m_moveType.back() == 1) {//castling
+		m_squares[lastMove[1][0] + 8 * lastMove[1][1]] = m_movelist->m_captureList.back();
+
+		if (lastMove[1][0] == 6) {
+			delete m_squares[7 + 8 * lastMove[1][1]];
+			m_squares[5 + 8 * lastMove[1][1]]->move({7, lastMove[1][1]});
+			m_squares[7 + 8 * lastMove[1][1]] = m_squares[5 + 8 * lastMove[1][1]];
+			m_squares[5 + 8 * lastMove[1][1]] = new EmptySquare(0, 5, lastMove[1][1], 0, m_kingTexture, this);
 		}
 		else {
-			m_blackKingPos = m_movelist.back()[0];
+			delete m_squares[8 * lastMove[1][1]];
+			m_squares[3 + 8 * lastMove[1][1]]->move({ 0, lastMove[1][1] });
+			m_squares[8 * lastMove[1][1]] = m_squares[3 + 8 * lastMove[1][1]];
+			m_squares[3 + 8 * lastMove[1][1]] = new EmptySquare(0, 3, lastMove[1][1], 0, m_kingTexture, this);
+		}
+	}
+	else if (m_movelist->m_moveType.back() == 2) {//promotion
+		m_squares[lastMove[1][0] + 8 * lastMove[1][1]] = m_movelist->m_captureList.back();
+		delete m_squares[lastMove[0][0] + 8 * lastMove[0][1]];
+		m_squares[lastMove[0][0] + 8 * lastMove[0][1]] = new Pawn(100, lastMove[0][0], lastMove[0][1], -1*turn, m_pawnTexture, this);
+	}
+	else {//en passant
+		m_squares[lastMove[1][0] + 8 * lastMove[1][1]] = new EmptySquare(0, lastMove[1][0], lastMove[1][1], 0, m_kingTexture, this);
+		delete m_squares[lastMove[1][0] + 8 * lastMove[0][1]];
+		m_squares[lastMove[1][0] + 8 * lastMove[0][1]] = m_movelist->m_captureList.back();
+	}
+
+	if (inSpace(lastMove[0])->getName() == "K") {
+		if (inSpace(lastMove[0])->getColor() == 1) {
+			m_whiteKingPos = lastMove[0];
+		}
+		else {
+			m_blackKingPos = lastMove[0];
 		}
 	}
 
-	m_movelist.pop_back();
-	m_captureList.pop_back();
-	m_capturePosList.pop_back();
+	m_movelist->removeFromMovelist();
 
 	turn = -1 * turn;
-	
-	std::size_t found = m_printMoves.find_last_of("-\n");
-	m_printMoves.erase(found, m_printMoves.length() - found);
-	m_text.setString(m_printMoves);
 };
 
 Piece* Board::inSpace(std::array<int, 2> position) {
 	return m_squares[position[0] + 8 * position[1]];
 };
-
-std::array<std::array<int, 2>, 2> Board::previousMove() {
-	return (m_movelist.size() == 0) ? (std::array<std::array<int, 2>, 2> { std::array<int, 2> {0, 0}, std::array<int, 2> {0, 0}}) : (m_movelist.back());
-};
-
-std::string Board::movelistToString(std::array<std::array<int, 2>, 2> move, Piece * piece, int specialMove, bool capture) {
-	std::string output;
-
-	if (piece->getColor() == 1)
-		output = "\n";
-	else
-		output = "-";
-
-	if (!specialMove) {
-
-		if (capture) {
-			if (piece->getName() == "")
-				output.append(gridNotation(move[0]).substr(0, 1));
-			else
-				output.append(piece->getName());
-
-			output.append("x");
-		}
-		else {
-			output.append(piece->getName());
-		}
-		output.append(gridToNotate(move[1], specialMove));
-		return output;
-	}
-	else if (specialMove == 1) {
-		//castle--------------------------------------------------------------
-		output.append(gridToNotate(move[1], specialMove));
-		return output;
-	}
-	else if (specialMove == 2) {
-		//promotion------------------------------------------------------------
-		if (capture)
-			output.append(gridNotation(move[0]).substr(0, 1) + "x");
-
-		output.append(gridToNotate(move[1], specialMove));
-		return output;
-	}
-	else if (specialMove == 3) {
-		//en passant-----------------------------------------------------------
-		output.append(gridNotation(move[0]).substr(0, 1));
-		output.append("x");
-		output.append(gridToNotate(move[1], specialMove));
-		
-		return output;
-	}
-};
-
-std::string Board::gridToNotate(std::array<int, 2> grid, int specialMove) {
-	std::string output;
-	if (!specialMove) {
-		output.append(gridNotation(grid));
-		return output;
-	}
-	else if (specialMove == 1) {
-		//castle
-		if (grid[0] == 6) {
-			output.append("0-0");
-			return output;
-		}
-		else {
-			output.append("0-0-0");
-			return output;
-		}
-	}
-	else if (specialMove == 2) {
-		//promotion
-		output.append("=Q");
-		return output;
-	}
-	else {
-		//en passant
-		output.append(gridNotation(grid));
-		output.append(" e.p.");
-		return output;
-	}
-};
-
-std::string Board::gridNotation(std::array<int, 2> grid) {
-	std::string output;
-
-	switch (grid[0]) {
-	case 0:
-		output.append("a");
-		break;
-	case 1:
-		output.append("b");
-		break;
-	case 2:
-		output.append("c");
-		break;
-	case 3:
-		output.append("d");
-		break;
-	case 4:
-		output.append("e");
-		break;
-	case 5:
-		output.append("f");
-		break;
-	case 6:
-		output.append("g");
-		break;
-	case 7:
-		output.append("h");
-		break;
-	};
-	output.append(std::to_string(grid[1] + 1));
-	return output;
-}
 
 std::array<int, 2> Board::kingPosition(int color) {
 	if (color == 1)
@@ -667,3 +527,7 @@ bool Board::checkmateCheck(std::array<int, 2> kingPos, std::vector<Piece*> check
 	std::cout << "unable to block checking piece" << std::endl;
 	return true;
 };
+
+std::array<std::array<int, 2>, 2> Board::previousMove() {
+	return m_movelist->previousMove();
+}

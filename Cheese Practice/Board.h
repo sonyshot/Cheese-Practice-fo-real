@@ -6,9 +6,14 @@
 #include <math.h>
 #include <algorithm>
 #include "Piece.h"
+#include "Movelist.h"
 
 class Board : public sf::Drawable {
+	friend class Movelist;
+
 	Board * m_buffer;
+
+	Movelist * m_movelist;
 
 	sf::Texture m_boardTexture;
 
@@ -32,14 +37,6 @@ class Board : public sf::Drawable {
 
 	std::array<int, 2> m_whiteKingPos;
 	std::array<int, 2> m_blackKingPos;
-
-	std::vector<std::array<std::array<int, 2>, 2>> m_movelist;
-	std::vector<std::string> m_captureList;
-	std::vector<std::array<int, 2>> m_capturePosList;
-
-	std::string m_printMoves = "Movelist:";
-	sf::Font m_font;
-	sf::Text m_text;
 
 	int turn = 1;
 public:
@@ -76,15 +73,7 @@ public:
 
 	std::array<int, 2> kingPosition(int color);
 
-	Piece * recreatePiece(int file, int rank, int color, std::string identifier);
-
 	Piece* inSpace(std::array<int, 2> position);
 
 	std::array<std::array<int, 2>, 2> previousMove();
-
-	std::string movelistToString(std::array<std::array<int, 2>, 2> move, Piece * piece, int specialMove, bool capture);
-
-	std::string gridToNotate(std::array<int, 2> location, int specialMove);
-
-	std::string gridNotation(std::array<int, 2> grid);
 };
