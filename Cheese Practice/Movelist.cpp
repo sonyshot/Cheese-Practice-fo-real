@@ -1,6 +1,9 @@
+
 #include "Movelist.h"
 
-Movelist::Movelist() {
+Movelist::Movelist(Board * board) {
+	m_board = board;
+
 	if (!m_font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf")) {
 		std::cout << "failed to load font" << std::endl;
 	}
@@ -11,6 +14,12 @@ Movelist::Movelist() {
 
 
 };
+
+Movelist::~Movelist() {
+	for (int i = 0; i < m_captureList.size(); i++) {
+		delete m_captureList[i];
+	}
+}
 
 std::string Movelist::squareName(std::array<int, 2> square) {
 	std::string output;
@@ -123,24 +132,27 @@ std::string Movelist::printableString(std::array<std::array<int, 2>, 2> move, Pi
 }
 
 void Movelist::addToMovelist(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
-	std::cout << this << std::endl;
+	
 	m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
-	m_captureList.push_back(m_board->inSpace(newPos)); //put captured piece into list
 
 	//special moves are indicated in m_moveType vector: 1 - castling; 2 - promotion; 3 - en passant
 	if (m_board->inSpace(currentPos)->canCastle(newPos)) {
+		m_captureList.push_back(m_board->inSpace(newPos)); //put captured piece into list
 		m_moveType.push_back(1);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 1)));
 	}
 	else if (m_board->inSpace(currentPos)->canPromote(newPos)) {
+		m_captureList.push_back(m_board->inSpace(newPos)); 
 		m_moveType.push_back(2);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 2)));
 	}
 	else if (m_board->inSpace(currentPos)->canEnPassant(newPos)) {
+		m_captureList.push_back(m_board->inSpace({ newPos[0], currentPos[1] })); 
 		m_moveType.push_back(3);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 3)));
 	}
 	else {
+		m_captureList.push_back(m_board->inSpace(newPos)); 
 		m_moveType.push_back(0);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 0)));
 	}

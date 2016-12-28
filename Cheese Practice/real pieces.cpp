@@ -1,3 +1,4 @@
+
 #include "real pieces.h"
 #include "Board.h"
 
@@ -267,7 +268,7 @@ bool King::legalMove(std::array<int, 2> move, Board * bufferBoard) {
 
 	if (bufferBoard != NULL) {
 		bufferBoard->movePiece(m_position, move);
-		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(getColor()), -1 * getColor()).size() != 0) {
+		if (bufferBoard->coveredSquare(bufferBoard->kingPosition(m_color), -1 * m_color).size() != 0) {
 			bufferBoard->undoMove();
 			return false;
 		}
@@ -291,7 +292,7 @@ void King::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 };
 
 bool King::canCastle(std::array<int, 2> move) {
-	if (!this->hasMoved()) {
+	if (!hasMoved()) {
 		if (move[0] == 6 && !(m_currentBoard->inSpace({ 7, (int)(3.5 - 3.5*m_color) })->hasMoved())) {
 			if (!m_currentBoard->inSpace({ 5, (int)(3.5 - 3.5*m_color) })->getColor() && !m_currentBoard->inSpace({ 6, (int)(3.5 - 3.5*m_color) })->getColor()) {
 				for (int i = 0; i < 2; i++) {

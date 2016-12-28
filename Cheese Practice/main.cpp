@@ -1,3 +1,4 @@
+
 #include <SFML/Graphics.hpp>
 #include "board.h"
 #include "Piece.h"
@@ -13,7 +14,7 @@ int main()
 	Board board(800, buffer);
 	std::array<int, 2> clicky;
 	int selectionFlag = 0;
-	std::cout << sizeof(Board);
+	Piece* pieceHeld = NULL;
 
 	while (window.isOpen())
 	{
@@ -29,6 +30,13 @@ int main()
 
 				// key pressed
 			case sf::Event::MouseButtonPressed:
+				selectionFlag = 1;
+				clicky = { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 };
+				pieceHeld = board.inSpace(clicky);
+				break;
+				/*
+				*****This is the original click once to pick a piece and click again to move it to a square*****
+
 				if (event.mouseButton.x > 800 && event.mouseButton.y < 100) {
 					board.undoMove();
 					std::cout << "move undone" << std::endl;
@@ -37,13 +45,33 @@ int main()
 					clicky = { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 };
 					selectionFlag = 1;
 					std::cout << "Piece selected position x: " << clicky[0] << " y: " << clicky[1] << std::endl;
+					std::cout << "Standard board moves " << board.inSpace(clicky)->hasMoved() << std::endl;
+					std::cout << "Buffer board moves " << buffer->inSpace(clicky)->hasMoved() << std::endl;
 				}
 				else {
+					std::cout << "Trying to move to x:" << event.mouseButton.x / 100 << " y:" << 7 - event.mouseButton.y / 100 << std::endl;
 					board.validMove(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
 					selectionFlag = 0;
 				}
 				break;
-
+				*/
+			case sf::Event::MouseMoved:
+				if (selectionFlag) {
+					pieceHeld->dragPiece({ event.mouseMove.x -50, event.mouseMove.y-50 });
+				}
+				break;
+			case sf::Event::MouseButtonReleased:
+				if (pieceHeld->legalMove({ event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 }, buffer)) {
+					board.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
+					bBuffer.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
+					std::cout << "valid move" << std::endl;
+				}
+				else {
+					std::cout << "invalid move" << std::endl;
+					pieceHeld->dragPiece({clicky[0]*100, (7-clicky[1])*100});
+				}
+				selectionFlag = 0;
+				break;
 				// we don't process other types of events
 			default:
 				break;
@@ -63,13 +91,11 @@ Board update loop?
 Things to implement
 - turns *DONE*
 - drawing the objects (should Board handle that and draw all of the pieces too?) *DONE*
--- will looping through all squares be too slow?
-- checkmate checker
+- checkmate checker *DONE*
 - stalemate checker
 - seeing movelist /in progress/
-- undo button /in progress/ (functions exactly right, UI for it isnt implemented)
+- undo button *DONE* (functions exactly right, UI for it isnt implemented)
 -- will need special considerations for special moves
-- go through and remove this->inspace in this file (maybe not, we'll see)
 - *this* inside class functions is apparently unneccessary, clean it up!
 
 */

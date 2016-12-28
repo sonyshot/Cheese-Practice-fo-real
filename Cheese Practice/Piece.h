@@ -25,6 +25,8 @@ public:
 
 	virtual void move(std::array<int, 2> newPos);
 
+	void dragPiece(std::array<int, 2> movement);
+
 	virtual bool canCastle(std::array<int, 2> move);
 
 	virtual bool canPromote(std::array<int, 2> move);

@@ -41,6 +41,9 @@ void Piece::move(std::array<int, 2> newPos) {
 	m_position.swap(newPos);
 	m_sprite.setPosition(sf::Vector2f(m_position[0]*m_size, (7-m_position[1])*m_size));
 };
+void Piece::dragPiece(std::array<int, 2> movement) {
+	m_sprite.setPosition(sf::Vector2f(movement[0], movement[1]));
+};
 bool Piece::canCastle(std::array<int, 2> move) {
 	return false;
 };
@@ -58,7 +61,12 @@ int Piece::hasMoved() {
 };
 
 void Piece::decrementMoves() {
-	m_numMoves--;
+	if (m_currentBoard != NULL) {
+		m_numMoves--;
+	}
+	else {
+		m_numMoves -= 3;
+	}
 };
 
 int Piece::getColor() {

@@ -27,7 +27,9 @@ class Movelist :public sf::Drawable {
 
 public:
 	//need constructor/destructor
-	Movelist();
+	Movelist(Board * board);
+
+	~Movelist();
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 

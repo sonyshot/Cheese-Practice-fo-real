@@ -1,8 +1,11 @@
+
 #include "Board.h"
 #include "real pieces.h"
 
 //buffer board constructor
 Board::Board() {
+	m_movelist = new Movelist(this);
+
 	for (int i = 0; i < 8; i++) {//create pawns on the board
 		m_squares[8 + i] = new Pawn(0, i, 1, 1, m_pawnTexture, this);
 		std::cout << "white pawn " << i << " created at (" << i << ", " << 1 << ")" << std::endl;
@@ -40,7 +43,7 @@ Board::Board(int size, Board * bufferBoard) {
 	//size should be a multiple of 8, not sure how it will draw otherwise
 	m_buffer = bufferBoard;
 
-	m_movelist = new Movelist();
+	m_movelist = new Movelist(this);
 
 	sf::Image blackSquare;
 	blackSquare.create(size / 8, size / 8, sf::Color(50, 50, 50, 255));
@@ -185,11 +188,8 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 	Piece * ppiece = inSpace(currentPos);
 	m_movelist->addToMovelist(currentPos, newPos);
 	if (1) {
-		//for some reason, as soon as ^this legalMove returns a value, it breaks all the textures in board's m_square array
-		//i'll try changing it to take board pointers instead of board objects
 		if (ppiece->canCastle(newPos)) {
 			
-			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = ppiece;
 			ppiece->move(newPos);
 			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
@@ -211,7 +211,6 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		}
 		else if (ppiece->canPromote(newPos)) { //promotion
 
-			delete m_squares[newPos[0] + 8 * newPos[1]];
 			delete m_squares[currentPos[0] + 8 * currentPos[1]];
 			//always gives queens atm
 			m_squares[newPos[0] + 8 * newPos[1]] = new Queen(100, newPos[0], newPos[1], turn, m_queenTexture, this);
@@ -223,7 +222,6 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		else if (ppiece->canEnPassant(newPos)) {
 
 			ppiece->move(newPos);
-			delete m_squares[newPos[0] + 8 * (newPos[1] - turn)];
 			m_squares[newPos[0] + 8 * (newPos[1] - 1)] = new EmptySquare(0, newPos[0], newPos[1] - turn, 0, m_kingTexture, this);
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8*currentPos[1]];
@@ -235,7 +233,6 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 		else {
 
 			ppiece->move(newPos);
-			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
 			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
 			std::cout << "Piece Moved!" << std::endl;
@@ -469,9 +466,11 @@ bool Board::checkmateCheck(std::array<int, 2> kingPos, std::vector<Piece*> check
 
 					if (inSpace(kingPos)->legalMove({ testX, testY }, m_buffer)) {
 
-						if (coveredSquare({ testX, testY }, -1*turn).size() != 0)
+						if (coveredSquare({ testX, testY }, -1 * turn).size() == 0) {
 
+							std::cout << "King can move to x: " << testX << " y: " << testY << std::endl;
 							return false;
+						}
 					}
 				}
 			}
@@ -496,8 +495,10 @@ bool Board::checkmateCheck(std::array<int, 2> kingPos, std::vector<Piece*> check
 				if (diff > 1) {
 					int sign = (checkingPiecePos[1] - kingPos[1]) / diff;
 					for (int i = 1; i < diff; i++) {
-						if (m_squares[i]->getColor() == turn && m_squares[i]->legalMove({ checkingPiecePos[0], checkingPiecePos[1] + i*sign }, m_buffer))
-							return false;
+						for (int j = 0; j < 64; j++) {
+							if (m_squares[i]->getColor() == turn && m_squares[i]->legalMove({ checkingPiecePos[0], checkingPiecePos[1] + i*sign }, m_buffer))
+								return false;
+						}
 					}
 				}
 			} else if (checkingPiecePos[1] == kingPos[1]) {
@@ -506,8 +507,10 @@ bool Board::checkmateCheck(std::array<int, 2> kingPos, std::vector<Piece*> check
 				if (diff > 1) {
 					int sign = (checkingPiecePos[0] - kingPos[0]) / diff;
 					for (int i = 1; i < diff; i++) {
-						if (m_squares[i]->getColor() == turn && m_squares[i]->legalMove({ checkingPiecePos[0] + i*sign, checkingPiecePos[1]}, m_buffer))
-							return false;
+						for (int j = 0; j < 64; j++) {
+							if (m_squares[j]->getColor() == turn && m_squares[j]->legalMove({ checkingPiecePos[0] + i*sign, checkingPiecePos[1] }, m_buffer))
+								return false;
+						}
 					}
 				}
 			} else {
@@ -517,8 +520,12 @@ bool Board::checkmateCheck(std::array<int, 2> kingPos, std::vector<Piece*> check
 					int signX = (checkingPiecePos[0] - kingPos[0]) / diff;
 					int signY = (checkingPiecePos[1] - kingPos[1]) / diff;
 					for (int i = 1; i < diff; i++) {
-						if (m_squares[i]->getColor() == turn && m_squares[i]->legalMove({ checkingPiecePos[0] + i*signX, checkingPiecePos[1] + i*signY }, m_buffer))
-							return false;
+						for (int j = 0; j < 64; j++) {
+							if (m_squares[j]->getColor() == turn  && m_squares[j]->getName() != "K" && m_squares[j]->legalMove({ kingPos[0] + i*signX, kingPos[1] + i*signY }, m_buffer)) {
+								std::cout << "Square x:" << kingPos[0] + i*signX << " y:" << kingPos[1] + i*signY << " can be moved to with piece " << j << std::endl;
+								return false;
+							}
+						}
 					}
 				}
 			}
