@@ -6,6 +6,11 @@
 Pawn::Pawn(int size, int file, int rank, int color, sf::Texture * texture, Board * board) :Piece(size, file, rank, color, texture, board, "") {};
 
 bool Pawn::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (m_currentBoard->whichTurn() != m_color) {
+		std::cout << "wrong turn" << std::endl;
+		return false;
+	}
+
 	if (move == m_position)
 		return false;
 
@@ -66,6 +71,10 @@ Knight::Knight(int size, int file, int rank, int color, sf::Texture * texture, B
 };
 
 bool Knight::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (m_currentBoard->whichTurn() != m_color) {
+		std::cout << "wrong turn" << std::endl;
+		return false;
+	}
 	if (move == m_position)
 		return false;
 
@@ -100,6 +109,10 @@ Bishop::Bishop(int size, int file, int rank, int color, sf::Texture * texture, B
 };
 
 bool Bishop::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (m_currentBoard->whichTurn() != m_color) {
+		std::cout << "wrong turn" << std::endl;
+		return false;
+	}
 	if (move == m_position)
 		return false;
 
@@ -141,6 +154,10 @@ Rook::Rook(int size, int file, int rank, int color, sf::Texture * texture, Board
 };
 
 bool Rook::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (m_currentBoard->whichTurn() != m_color) {
+		std::cout << "wrong turn" << std::endl;
+		return false;
+	}
 	if (move == m_position)
 		return false;
 
@@ -195,6 +212,10 @@ Queen::Queen(int size, int file, int rank, int color, sf::Texture * texture, Boa
 };
 
 bool Queen::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (m_currentBoard->whichTurn() != m_color) {
+		std::cout << "wrong turn" << std::endl;
+		return false;
+	}
 	if (move == m_position)
 		return false;
 
@@ -263,6 +284,10 @@ King::King(int size, int file, int rank, int color, sf::Texture * texture, Board
 };
 
 bool King::legalMove(std::array<int, 2> move, Board * bufferBoard) {
+	if (m_currentBoard->whichTurn() != m_color) {
+		std::cout << "wrong turn" << std::endl;
+		return false;
+	}
 	if (move == m_position)
 		return false;
 

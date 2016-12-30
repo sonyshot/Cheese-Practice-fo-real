@@ -133,25 +133,32 @@ std::string Movelist::printableString(std::array<std::array<int, 2>, 2> move, Pi
 
 void Movelist::addToMovelist(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	
-	m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
-
+	
 	//special moves are indicated in m_moveType vector: 1 - castling; 2 - promotion; 3 - en passant
 	if (m_board->inSpace(currentPos)->canCastle(newPos)) {
+		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
+
 		m_captureList.push_back(m_board->inSpace(newPos)); //put captured piece into list
 		m_moveType.push_back(1);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 1)));
 	}
 	else if (m_board->inSpace(currentPos)->canPromote(newPos)) {
+		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
+
 		m_captureList.push_back(m_board->inSpace(newPos)); 
 		m_moveType.push_back(2);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 2)));
 	}
 	else if (m_board->inSpace(currentPos)->canEnPassant(newPos)) {
+		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
+
 		m_captureList.push_back(m_board->inSpace({ newPos[0], currentPos[1] })); 
 		m_moveType.push_back(3);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 3)));
 	}
 	else {
+		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
+
 		m_captureList.push_back(m_board->inSpace(newPos)); 
 		m_moveType.push_back(0);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 0)));
@@ -159,14 +166,36 @@ void Movelist::addToMovelist(std::array<int, 2> currentPos, std::array<int, 2> n
 }
 
 void Movelist::removeFromMovelist() {
-	//put piece pointer from capturelist back into Board m_squares
-	//^^ handled in undomove of board.cpp
+	//special considerations for moving pieces back into the board are done via undoMove within the board
+	//this function simply removes the last entry of each stored list and corrects the movelist text accordingly
 
-	//will be updated to look for move type, mostly for castling
-	std::size_t found = m_printMoves.find_last_of("-\n");
-	m_printMoves.erase(found, m_printMoves.length() - found);
+	//0-normal move; 1-castling; 2-promotion; 3-en passant
+	if (m_moveType.back() == 0) {
+		std::size_t found = m_printMoves.find_last_of("-\n");
+		m_printMoves.erase(found, m_printMoves.length() - found);
+	}
+	else if (m_moveType.back() == 1) {
+		if (m_movelist.back()[1][0] == 6) {
+			//kingside castling
+			m_printMoves.erase(m_printMoves.length() - 4, 4);
+		}
+		else
+		{
+			//queenside castling
+			m_printMoves.erase(m_printMoves.length() - 6, 6);
+		}
+
+	}
+	else if (m_moveType.back() == 2) {
+		std::size_t found = m_printMoves.find_last_of("-\n");
+		m_printMoves.erase(found, m_printMoves.length() - found);
+	}
+	else {
+		std::size_t found = m_printMoves.find_last_of("-\n");
+		m_printMoves.erase(found, m_printMoves.length() - found);
+	}
 	m_text.setString(m_printMoves);
-
+	
 	m_movelist.pop_back();
 	m_captureList.pop_back();
 	m_moveType.pop_back();

@@ -76,4 +76,6 @@ public:
 	Piece* inSpace(std::array<int, 2> position);
 
 	std::array<std::array<int, 2>, 2> previousMove();
+
+	int whichTurn();
 };

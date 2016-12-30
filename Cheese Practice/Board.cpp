@@ -141,13 +141,12 @@ Board::~Board() {
 
 };
 
-//-------maybe put above in constructor? no need to create a texture every time this is drawn--------
-//draw sprite lel
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 	for (int i = 0; i < 64; i++) {
 		target.draw(*m_squares[i], states);
 	};
+	target.draw(*m_movelist, states);
 };
 //see above
 
@@ -186,10 +185,10 @@ void Board::updateMoveList(std::array<int, 2> currentPos, std::array<int, 2> new
 
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	Piece * ppiece = inSpace(currentPos);
-	m_movelist->addToMovelist(currentPos, newPos);
+	
 	if (1) {
 		if (ppiece->canCastle(newPos)) {
-			
+			m_movelist->addToMovelist(currentPos, newPos);
 			m_squares[newPos[0] + 8 * newPos[1]] = ppiece;
 			ppiece->move(newPos);
 			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
@@ -210,7 +209,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			turn = -1 * turn;
 		}
 		else if (ppiece->canPromote(newPos)) { //promotion
-
+			m_movelist->addToMovelist(currentPos, newPos);
 			delete m_squares[currentPos[0] + 8 * currentPos[1]];
 			//always gives queens atm
 			m_squares[newPos[0] + 8 * newPos[1]] = new Queen(100, newPos[0], newPos[1], turn, m_queenTexture, this);
@@ -220,9 +219,10 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			turn = -1 * turn;
 		}
 		else if (ppiece->canEnPassant(newPos)) {
-
+			//deleting piece being added to capturelist, fix it
+			m_movelist->addToMovelist(currentPos, newPos);
 			ppiece->move(newPos);
-			m_squares[newPos[0] + 8 * (newPos[1] - 1)] = new EmptySquare(0, newPos[0], newPos[1] - turn, 0, m_kingTexture, this);
+			m_squares[newPos[0] + 8 * currentPos[1]] = new EmptySquare(0, newPos[0], currentPos[1], 0, m_kingTexture, this);
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8*currentPos[1]];
 			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
@@ -231,7 +231,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			turn = -1 * turn;
 		}
 		else {
-
+			m_movelist->addToMovelist(currentPos, newPos);
 			ppiece->move(newPos);
 			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
 			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
@@ -537,4 +537,8 @@ bool Board::checkmateCheck(std::array<int, 2> kingPos, std::vector<Piece*> check
 
 std::array<std::array<int, 2>, 2> Board::previousMove() {
 	return m_movelist->previousMove();
+}
+
+int Board::whichTurn() {
+	return turn;
 }

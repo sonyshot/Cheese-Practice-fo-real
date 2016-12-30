@@ -30,9 +30,15 @@ int main()
 
 				// key pressed
 			case sf::Event::MouseButtonPressed:
-				selectionFlag = 1;
-				clicky = { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 };
-				pieceHeld = board.inSpace(clicky);
+				if (event.mouseButton.x < 800) {
+					selectionFlag = 1;
+					clicky = { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 };
+					pieceHeld = board.inSpace(clicky);
+				}
+				else {
+					board.undoMove();
+					std::cout << "move undone" << std::endl;
+				}
 				break;
 				/*
 				*****This is the original click once to pick a piece and click again to move it to a square*****
@@ -57,20 +63,22 @@ int main()
 				*/
 			case sf::Event::MouseMoved:
 				if (selectionFlag) {
-					pieceHeld->dragPiece({ event.mouseMove.x -50, event.mouseMove.y-50 });
+					pieceHeld->dragPiece({ event.mouseMove.x - 50, event.mouseMove.y - 50 });
 				}
 				break;
 			case sf::Event::MouseButtonReleased:
-				if (pieceHeld->legalMove({ event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 }, buffer)) {
-					board.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
-					bBuffer.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
-					std::cout << "valid move" << std::endl;
+				if (selectionFlag) {
+					if (pieceHeld->legalMove({ event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 }, buffer)) {
+						board.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
+						bBuffer.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
+						std::cout << "valid move" << std::endl;
+					}
+					else {
+						std::cout << "invalid move" << std::endl;
+						pieceHeld->dragPiece({ clicky[0] * 100, (7 - clicky[1]) * 100 });
+					}
+					selectionFlag = 0;
 				}
-				else {
-					std::cout << "invalid move" << std::endl;
-					pieceHeld->dragPiece({clicky[0]*100, (7-clicky[1])*100});
-				}
-				selectionFlag = 0;
 				break;
 				// we don't process other types of events
 			default:
@@ -93,61 +101,10 @@ Things to implement
 - drawing the objects (should Board handle that and draw all of the pieces too?) *DONE*
 - checkmate checker *DONE*
 - stalemate checker
-- seeing movelist /in progress/
-- undo button *DONE* (functions exactly right, UI for it isnt implemented)
+- seeing movelist *DONE*
+- undo button *DONE* (functions exactly right, UI for it isnt implemented *DONE*)
 -- will need special considerations for special moves
-- *this* inside class functions is apparently unneccessary, clean it up!
+- *this* inside class functions is apparently unneccessary, clean it up! *DONE*
+- add 'flipped board' functionality, probably best to convert input and output than to make adjustments in base code to account for it
 
-*/
-/*
-#include <SFML\Graphics.hpp>
-#include <iostream>
-
-
-int main() {
-	sf::RenderWindow window(sf::VideoMode(1200, 800), "Test");
-	sf::RectangleShape rect(sf::Vector2f(32, 32));
-	rect.setFillColor(sf::Color(255, 255, 255));
-	rect.setPosition(sf::Vector2f(600, 400));
-	window.setMouseCursorVisible(false);
-	std::vector<sf::CircleShape> circles;
-	int count = 0;
-	std::srand(std::time(0));
-
-	while (window.isOpen()) {
-
-		sf::Event event;
-
-		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::Closed) {
-				window.close();
-			}
-			if (event.type == sf::Event::MouseMoved) {
-				rect.setPosition(event.mouseMove.x, event.mouseMove.y);
-			}
-		}
-		count++;
-		if (count > 100) {
-			
-			int x = std::rand() % 1200;
-			int y = std::rand() % 800;
-			std::cout << "x: " << x << " y: " << y << std::endl;
-			sf::CircleShape circle;
-			circle.setRadius(16);
-			circle.setFillColor(sf::Color(255, 255, 255));
-			circle.setPosition(sf::Vector2f(x, y));
-			circles.push_back(circle);
-			count = 0;
-		}
-
-		window.clear();
-		window.draw(rect);
-		for (int i = 0; i < circles.size(); i++) {
-			window.draw(circles[i]);
-		}
-		window.display();
-	}
-
-	return 0;
-}
 */
