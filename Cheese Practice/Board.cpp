@@ -138,7 +138,6 @@ Board::~Board() {
 	};
 	delete m_movelist;
 
-
 };
 
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -251,6 +250,10 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 					std::cout << "check" << std::endl;
 					if (checkmateCheck((turn == 1) ? m_whiteKingPos : m_blackKingPos, checkingPieces))
 						std::cout << "Checkmate!" << std::endl;
+				}
+				else {
+					if (stalemateCheck())
+						std::cout << "Stalemate!" << std::endl;
 				}
 			}
 		}
@@ -535,10 +538,27 @@ bool Board::checkmateCheck(std::array<int, 2> kingPos, std::vector<Piece*> check
 	return true;
 };
 
+bool Board::stalemateCheck() {
+	for (int i = 0; i < 64; i++) {
+		if (m_squares[i]->getColor() == turn) {
+			if (m_squares[i]->listLegalMoves(m_buffer).size())
+				return false;
+		}
+	}
+	return true;
+};
+
 std::array<std::array<int, 2>, 2> Board::previousMove() {
 	return m_movelist->previousMove();
 }
 
 int Board::whichTurn() {
 	return turn;
+}
+
+void Board::writeMovelistToFile(std::string filename) {
+	std::ofstream file;
+	file.open(filename);
+	file << m_movelist->m_printMoves;
+	file.close();
 }

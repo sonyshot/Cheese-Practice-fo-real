@@ -1,0 +1,1 @@
+This log contains the date of the debug run, the final movelist, and any problems encountered

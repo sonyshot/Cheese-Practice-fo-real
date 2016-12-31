@@ -65,6 +65,21 @@ bool Pawn::canEnPassant(std::array<int, 2> move) {
 		return false;
 };
 
+std::vector<std::array<int, 2>> Pawn::listLegalMoves(Board * bufferBoard) {
+	std::vector<std::array<int, 2>> output;
+	for (int i = -1; i < 2; i++) {
+		if (m_position[0] + i >= 0 && m_position[0] + i <= 7) {
+			if (legalMove({ m_position[0] + i, m_position[1] + m_color }, bufferBoard)) {
+				output.push_back({ m_position[0] + i, m_position[1] + m_color });
+			}
+		}
+	}
+	if (m_position[1] == 1 && legalMove({ m_position[0], m_position[1] + 2 }, bufferBoard)) {
+		output.push_back({ m_position[0], m_position[1] + 2 });
+	}
+	return output;
+}
+
 //KNIGHT----------------------------------------------------------------------------------
 Knight::Knight(int size, int file, int rank, int color, sf::Texture * texture, Board * board) :Piece(size, file, rank, color, texture, board, "N") {
 
@@ -96,6 +111,22 @@ bool Knight::legalMove(std::array<int, 2> move, Board * bufferBoard) {
 		return false;
 	};
 };
+
+std::vector<std::array<int, 2>> Knight::listLegalMoves(Board * bufferBoard) {
+	std::vector<std::array<int, 2>> output;
+	for (int i = 1; i < 12; i++) {
+		if (i % 3 != 0) {
+			int testX = (int)(m_position[0] + 2.23607*cos(i*3.1415926 / 6.0) + 0.5);
+			int testY = (int)(m_position[1] + 2.23607*sin(i*3.1415926 / 6.0) + 0.5);
+			if ((testX < 8 && testX >= 0) && (testY < 8 && testY >= 0)) {
+				if (legalMove({ testX, testY }, bufferBoard)) {
+					output.push_back({ testX, testY });
+				}
+			}
+		}
+	}
+	return output;
+}
 
 	//this needs to be redone/actually done
 void Knight::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -141,6 +172,45 @@ bool Bishop::legalMove(std::array<int, 2> move, Board * bufferBoard) {
 	else
 		return false;
 };
+
+std::vector<std::array<int, 2>> Bishop::listLegalMoves(Board * bufferBoard) {
+	std::vector<std::array<int, 2>> output;
+	int posX = 7 - m_position[0];
+	int posY = 7 - m_position[1];
+	for (int i = 1; i <= std::min(posX, posY); i++) {
+		if (legalMove({ m_position[0] + i, m_position[1] + i }, bufferBoard)) {
+			output.push_back({ m_position[0] + i, m_position[1] + i });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= std::min(m_position[0], posY); i++) {
+		if (legalMove({ m_position[0] - i, m_position[1] + i }, bufferBoard)) {
+			output.push_back({ m_position[0] - i, m_position[1] + i });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= std::min(m_position[0], m_position[1]); i++) {
+		if (legalMove({ m_position[0] - i, m_position[1] - i }, bufferBoard)) {
+			output.push_back({ m_position[0] - i, m_position[1] - i });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= std::min(posX, m_position[1]); i++) {
+		if (legalMove({ m_position[0] + i, m_position[1] - i }, bufferBoard)) {
+			output.push_back({ m_position[0] + i, m_position[1] - i });
+		}
+		else {
+			break;
+		}
+	}
+	return output;
+}
 
 	//this needs to be redone/actually done
 void Bishop::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -199,6 +269,45 @@ bool Rook::legalMove(std::array<int, 2> move, Board * bufferBoard) {
 		return false;
 	}
 };
+
+std::vector<std::array<int, 2>> Rook::listLegalMoves(Board * bufferBoard) {
+	std::vector<std::array<int, 2>> output;
+	int posX = 7 - m_position[0];
+	int posY = 7 - m_position[1];
+	for (int i = 1; i <= posX; i++) {
+		if (legalMove({ m_position[0] + i, m_position[1] }, bufferBoard)) {
+			output.push_back({ m_position[0] + i, m_position[1] });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= posY; i++) {
+		if (legalMove({ m_position[0], m_position[1] + i }, bufferBoard)) {
+			output.push_back({ m_position[0], m_position[1] + i });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= m_position[0]; i++) {
+		if (legalMove({ m_position[0] - i, m_position[1] }, bufferBoard)) {
+			output.push_back({ m_position[0] - i, m_position[1] });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= m_position[1]; i++) {
+		if (legalMove({ m_position[0], m_position[1] - i }, bufferBoard)) {
+			output.push_back({ m_position[0], m_position[1] - i });
+		}
+		else {
+			break;
+		}
+	}
+	return output;
+}
 
 	//this needs to be redone/actually done
 void Rook::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -272,6 +381,77 @@ bool Queen::legalMove(std::array<int, 2> move, Board * bufferBoard) {
 	}
 };
 
+std::vector<std::array<int, 2>> Queen::listLegalMoves(Board * bufferBoard) {
+	std::vector<std::array<int, 2>> output;
+	int posX = 7 - m_position[0];
+	int posY = 7 - m_position[1];
+	for (int i = 1; i <= std::min(posX, posY); i++) {
+		if (legalMove({ m_position[0] + i, m_position[1] + i }, bufferBoard)) {
+			output.push_back({ m_position[0] + i, m_position[1] + i });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= std::min(m_position[0], posY); i++) {
+		if (legalMove({ m_position[0] - i, m_position[1] + i }, bufferBoard)) {
+			output.push_back({ m_position[0] - i, m_position[1] + i });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= std::min(m_position[0], m_position[1]); i++) {
+		if (legalMove({ m_position[0] - i, m_position[1] - i }, bufferBoard)) {
+			output.push_back({ m_position[0] - i, m_position[1] - i });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= std::min(posX, m_position[1]); i++) {
+		if (legalMove({ m_position[0] + i, m_position[1] - i }, bufferBoard)) {
+			output.push_back({ m_position[0] + i, m_position[1] - i });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= posX; i++) {
+		if (legalMove({ m_position[0] + i, m_position[1] }, bufferBoard)) {
+			output.push_back({ m_position[0] + i, m_position[1] });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= posY; i++) {
+		if (legalMove({ m_position[0], m_position[1] + i }, bufferBoard)) {
+			output.push_back({ m_position[0], m_position[1] + i });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= m_position[0]; i++) {
+		if (legalMove({ m_position[0] - i, m_position[1] }, bufferBoard)) {
+			output.push_back({ m_position[0] - i, m_position[1] });
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 1; i <= m_position[1]; i++) {
+		if (legalMove({ m_position[0], m_position[1] - i }, bufferBoard)) {
+			output.push_back({ m_position[0], m_position[1] - i });
+		}
+		else {
+			break;
+		}
+	}
+	return output;
+}
+
 	//this needs to be redone/actually done
 void Queen::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
@@ -310,6 +490,20 @@ bool King::legalMove(std::array<int, 2> move, Board * bufferBoard) {
 	else
 		return false;
 };
+
+std::vector<std::array<int, 2>> King::listLegalMoves(Board * bufferBoard) {
+	std::vector<std::array<int, 2>> output;
+	for (int i = -1; i < 2; i++) {
+		for (int j = -1; j < 2; j++) {
+			if (i || j) {
+				if (legalMove({ m_position[0] + i, m_position[1] + j }, bufferBoard)) {
+					output.push_back({ m_position[0] + i, m_position[1] + j });
+				}
+			}
+		}
+	}
+	return output;
+}
 
 	//this needs to be redone/actually done
 void King::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -369,6 +563,11 @@ EmptySquare::EmptySquare(int size, int file, int rank, int color, const sf::Text
 bool EmptySquare::legalMove(std::array<int, 2> move, Board * bufferBoard) {
 	return false;
 };
+
+std::vector<std::array<int, 2>> EmptySquare::listLegalMoves(Board * bufferBoard) {
+	std::vector<std::array<int, 2>> output;
+	return output;
+}
 
 	//this needs to be redone/actually done
 void EmptySquare::draw(sf::RenderTarget& target, sf::RenderStates states) const {

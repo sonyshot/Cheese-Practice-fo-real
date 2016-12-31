@@ -13,6 +13,8 @@ public:
 
 	bool canEnPassant(std::array<int, 2> move);
 
+	std::vector<std::array<int, 2>> listLegalMoves(Board * bufferBoard);
+
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	//see above
@@ -25,6 +27,8 @@ public:
 	Knight::Knight(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
 	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
+
+	std::vector<std::array<int, 2>> listLegalMoves(Board * bufferBoard);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -39,6 +43,8 @@ public:
 
 	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
 
+	std::vector<std::array<int, 2>> listLegalMoves(Board * bufferBoard);
+
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	//see above
@@ -51,6 +57,8 @@ public:
 	Rook::Rook(int size, int file, int rank, int color, sf::Texture * texture, Board * board);
 
 	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
+
+	std::vector<std::array<int, 2>> listLegalMoves(Board * bufferBoard);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -66,6 +74,8 @@ public:
 
 	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
 
+	std::vector<std::array<int, 2>> listLegalMoves(Board * bufferBoard);
+
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	//see above
@@ -80,6 +90,8 @@ public:
 	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
 
 	bool canCastle(std::array<int, 2> move);
+
+	std::vector<std::array<int, 2>> listLegalMoves(Board * bufferBoard);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -97,6 +109,8 @@ public:
 	EmptySquare(int size, int file, int rank, int color, const sf::Texture * texture, Board * board);
 
 	bool legalMove(std::array<int, 2> move, Board * bufferBoard);
+
+	std::vector<std::array<int, 2>> listLegalMoves(Board * bufferBoard);
 
 	//this needs to be redone/actually done
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;

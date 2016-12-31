@@ -78,3 +78,18 @@ std::string Piece::getName() {
 std::array<int, 2> Piece::getPosition() {
 	return m_position;
 };
+
+void Piece::setCapture(int capture) {
+	m_isCaptured = capture;
+};
+
+bool Piece::isCaptured() {
+	return m_isCaptured;
+};
+
+bool Piece::operator==(const Piece& piece) {
+	if (m_position == piece.m_position && m_color == piece.m_color && m_name == piece.m_name && m_isCaptured == piece.m_isCaptured)
+		return true;
+	else
+		return false;
+}
