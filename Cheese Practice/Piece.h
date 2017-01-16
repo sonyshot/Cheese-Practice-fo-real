@@ -14,7 +14,7 @@ protected:
 	float m_size;
 	Board * m_currentBoard;
 	std::string m_name;
-	int m_isCaptured = 0;
+	bool m_isCaptured = 0;
 public:
 	Piece();
 
@@ -38,7 +38,7 @@ public:
 
 	int getColor();
 
-	void setCapture(int capture);
+	void setCapture(bool capture);
 
 	bool isCaptured();
 
@@ -46,12 +46,14 @@ public:
 
 	int hasMoved();
 
+	void incrementMoves();
+
 	void decrementMoves();
 
 	virtual bool legalMove(std::array<int, 2> move, Board * bufferBoard) = 0;
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 
-	bool operator==(const Piece& piece);
+	bool operator==(const Piece& piece) const;
 };
 

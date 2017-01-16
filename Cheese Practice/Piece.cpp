@@ -31,18 +31,17 @@ Piece::Piece(int size, int file, int rank, int color, sf::Texture * texture, Boa
 	if (color == -1) {
 		m_sprite.setColor(sf::Color::Black);
 	}
-	m_sprite.setPosition(sf::Vector2f(file * size, (7-rank) * size));
+	m_sprite.setPosition(sf::Vector2f((float)(file * size), (float)(7-rank) * size));
 	m_currentBoard = board;
 	m_name = identifier;
 };
 
 void Piece::move(std::array<int, 2> newPos) {
-	m_numMoves ++;
 	m_position.swap(newPos);
 	m_sprite.setPosition(sf::Vector2f(m_position[0]*m_size, (7-m_position[1])*m_size));
 };
 void Piece::dragPiece(std::array<int, 2> movement) {
-	m_sprite.setPosition(sf::Vector2f(movement[0], movement[1]));
+	m_sprite.setPosition(sf::Vector2f((float)movement[0], (float)movement[1]));
 };
 bool Piece::canCastle(std::array<int, 2> move) {
 	return false;
@@ -61,13 +60,12 @@ int Piece::hasMoved() {
 };
 
 void Piece::decrementMoves() {
-	if (m_currentBoard != NULL) {
-		m_numMoves--;
-	}
-	else {
-		m_numMoves -= 3;
-	}
+	m_numMoves--;
 };
+
+void Piece::incrementMoves() {
+	m_numMoves++;
+}
 
 int Piece::getColor() {
 	return m_color;
@@ -79,7 +77,7 @@ std::array<int, 2> Piece::getPosition() {
 	return m_position;
 };
 
-void Piece::setCapture(int capture) {
+void Piece::setCapture(bool capture) {
 	m_isCaptured = capture;
 };
 
@@ -87,7 +85,7 @@ bool Piece::isCaptured() {
 	return m_isCaptured;
 };
 
-bool Piece::operator==(const Piece& piece) {
+bool Piece::operator==(const Piece& piece) const {
 	if (m_position == piece.m_position && m_color == piece.m_color && m_name == piece.m_name && m_isCaptured == piece.m_isCaptured)
 		return true;
 	else

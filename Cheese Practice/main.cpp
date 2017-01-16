@@ -21,16 +21,18 @@ int main()
 	std::array<int, 2> clicky;
 	int selectionFlag = 0;
 	Piece* pieceHeld = NULL;
+	bool flippedBoard = 0;
 
 	sf::RectangleShape rectangle;
 	rectangle.setSize(sf::Vector2f(800, 800));
 	rectangle.setFillColor(sf::Color::Red);
 
+
 	while (window.isOpen())
 	{
 		//testing menu screen, etc.
 		while (windowState == 0) {
-
+			//game loop
 			sf::Event event;
 			while (window.pollEvent(event))
 			{
@@ -38,24 +40,37 @@ int main()
 				{
 					// window closed
 				case sf::Event::Closed:
+				{
 					window.close();
-					windowState = 2;
+					/*time_t rawtime;
+					time(&rawtime);
+					std::ofstream myfile("ErrorLog.txt", std::ofstream::app);
+					myfile << asctime(localtime(&rawtime));
+					myfile.close();
+					board.writeMovelistToFile("ErrorLog.txt");*/
+					windowState = -1;
 					break;
-
+				}
 					// key pressed
 				case sf::Event::MouseButtonPressed:
-					if (event.mouseButton.x < 800) {
+					if (event.mouseButton.x < 800 && event.mouseButton.y < 800) {
 						selectionFlag = 1;
-						clicky = { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 };
+						if (!flippedBoard)
+							clicky = { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 };
+						else
+							clicky = { event.mouseButton.x / 100, event.mouseButton.y / 100 };
 						pieceHeld = board.inSpace(clicky);
 					}
-					else if(event.mouseButton.y > 400){
+					else if(event.mouseButton.y > 400 && event.mouseButton.y < 800){
 						windowState = 1;
 					}
-					else {
+					else if (event.mouseButton.y < 400){
+						board.inSpace(board.previousMove()[1])->decrementMoves();
 						board.undoMove();
 						std::cout << "move undone" << std::endl;
 					}
+					else
+						flippedBoard = !flippedBoard;
 					break;
 					/*
 					*****This is the original click once to pick a piece and click again to move it to a square*****
@@ -85,16 +100,34 @@ int main()
 					break;
 				case sf::Event::MouseButtonReleased:
 					if (selectionFlag) {
-						if (pieceHeld->legalMove({ event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 }, buffer)) {
-							board.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
-							bBuffer.movePiece(clicky, { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 });
-							std::cout << "valid move" << std::endl;
+						if (!flippedBoard) {
+							std::array<int, 2> released = { event.mouseButton.x / 100, 7 - event.mouseButton.y / 100 };
+							if (pieceHeld->legalMove(released, buffer)) {
+								board.movePiece(clicky, released);
+								bBuffer.movePiece(clicky, released);
+								pieceHeld->incrementMoves();
+								std::cout << "valid move" << std::endl;
+							}
+							else {
+								std::cout << "invalid move" << std::endl;
+								pieceHeld->dragPiece({ clicky[0] * 100, (7 - clicky[1]) * 100 });
+							}
+							selectionFlag = 0;
 						}
 						else {
-							std::cout << "invalid move" << std::endl;
-							pieceHeld->dragPiece({ clicky[0] * 100, (7 - clicky[1]) * 100 });
+							std::array<int, 2> released = { event.mouseButton.x / 100, event.mouseButton.y / 100 };
+							if (pieceHeld->legalMove(released, buffer)) {
+								board.movePiece(clicky, released);
+								bBuffer.movePiece(clicky, released);
+								pieceHeld->incrementMoves();
+								std::cout << "valid move" << std::endl;
+							}
+							else {
+								std::cout << "invalid move" << std::endl;
+								pieceHeld->dragPiece({ clicky[0] * 100, (clicky[1]) * 100 });
+							}
+							selectionFlag = 0;
 						}
-						selectionFlag = 0;
 					}
 					break;
 					// we don't process other types of events
@@ -108,13 +141,14 @@ int main()
 			window.display();
 		}
 		while (windowState == 1) {
+			//starting menu loop
 			sf::Event event;
 			while (window.pollEvent(event)) {
 				switch (event.type) {
 
 				case sf::Event::Closed:
 					window.close();
-					windowState = 2;
+					windowState = -1;
 					break;
 
 				case sf::Event::MouseButtonPressed:
@@ -138,9 +172,9 @@ Things to implement
 - turns *DONE*
 - drawing the objects (should Board handle that and draw all of the pieces too?) *DONE*
 - checkmate checker *DONE*
-- stalemate checker /in progress/ (currently working on 50 moves sans capture and insufficient checkmating material)
+- stalemate checker /in progress/ (currently working on 50 moves sans capture *DONE* and insufficient checkmating material)
 - seeing movelist *DONE*
-- undo button *DONE* (functions exactly right, UI for it isnt implemented *DONE*)
+- undo button *DONE* (functions exactly right, UI for it isnt implemented)
 -- will need special considerations for special moves
 - *this* inside class functions is apparently unneccessary, clean it up! *DONE*
 - add 'flipped board' functionality, probably best to convert input and output than to make adjustments in base code to account for it
@@ -148,4 +182,7 @@ Things to implement
 - generalize piece/board sizes to allow for scaling of the board
 - add sleep/timer for a 60 fps update loop
 - logging to txt file(s)
+
+---Using vector.reserve()
+---setting dangling pointers to NULL after deleting their objects
 */

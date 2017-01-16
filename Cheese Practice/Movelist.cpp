@@ -139,6 +139,7 @@ void Movelist::addToMovelist(std::array<int, 2> currentPos, std::array<int, 2> n
 		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
 
 		m_captureList.push_back(m_board->inSpace(newPos)); //put captured piece into list
+		m_captureList.back()->setCapture(1);
 		m_moveType.push_back(1);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 1)));
 	}
@@ -146,6 +147,7 @@ void Movelist::addToMovelist(std::array<int, 2> currentPos, std::array<int, 2> n
 		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
 
 		m_captureList.push_back(m_board->inSpace(newPos)); 
+		m_captureList.back()->setCapture(1);
 		m_moveType.push_back(2);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 2)));
 	}
@@ -153,6 +155,7 @@ void Movelist::addToMovelist(std::array<int, 2> currentPos, std::array<int, 2> n
 		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
 
 		m_captureList.push_back(m_board->inSpace({ newPos[0], currentPos[1] })); 
+		m_captureList.back()->setCapture(1);
 		m_moveType.push_back(3);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 3)));
 	}
@@ -160,6 +163,7 @@ void Movelist::addToMovelist(std::array<int, 2> currentPos, std::array<int, 2> n
 		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
 
 		m_captureList.push_back(m_board->inSpace(newPos)); 
+		m_captureList.back()->setCapture(1);
 		m_moveType.push_back(0);
 		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 0)));
 	}
@@ -213,4 +217,58 @@ std::array<std::array<int, 2>, 2> Movelist::previousMove() {
 
 void Movelist::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_text, states);
+}
+
+std::string Movelist::hashBoard() {
+	std::string key;
+	Piece * currentPiece;
+	for (int i = 0; i < 64; i++) {
+		currentPiece = m_board->m_squares[i];
+		key.append(hashPiece(currentPiece));
+	}
+	if (m_board->turn == 1)
+		key.append("+");
+	else
+		key.append("-");
+
+	return key;
+}
+
+std::string Movelist::hashPiece(Piece * piece) {
+	std::string output;
+	if (piece->getName() == "") {
+		output.append("P");
+	}
+	else {
+		output.append(piece->getName());
+	}
+	if (piece->getName() == "") {
+		if (piece->canEnPassant({ piece->getPosition()[0] - 1, piece->getPosition()[1] + piece->getColor() })) {
+			output.append("1"); //en passant left available
+		}
+		else if (piece->canEnPassant({ piece->getPosition()[0] + 1, piece->getPosition()[1] + piece->getColor() })) {
+			output.append("2"); //en passant right available
+		}
+		else {
+			output.append("0"); //can't en passant
+		}
+	}
+	else if (piece->getName() == "R") {
+		if (!piece->hasMoved())
+			output.append("1"); //can't castle
+		else
+			output.append("0");
+	}
+	else if(piece->getName() == "K"){
+		if (piece->canCastle({ piece->getPosition()[0] + 2, piece->getPosition()[1] }))
+			output.append("1"); //castle right
+		else if (piece->canCastle({ piece->getPosition()[0] - 2, piece->getPosition()[1] }))
+			output.append("2"); //castle left
+		else
+			output.append("0"); //can't castle
+	}
+	else {
+		output.append("0");
+	}
+	return output;
 }

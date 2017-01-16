@@ -4,6 +4,7 @@
 #include <array>
 #include <string>
 #include <math.h>
+#include <unordered_map>
 #include "Piece.h"
 #include "Board.h"
 
@@ -25,11 +26,15 @@ class Movelist :public sf::Drawable {
 
 	std::string printableString(std::array<std::array<int, 2>, 2> square, Piece * piece, int specialMove);
 
+	std::unordered_map<std::string, int> m_boardStateMap;
+
 public:
 	//need constructor/destructor
 	Movelist(Board * board);
 
 	~Movelist();
+
+	std::string hashBoard();
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
@@ -38,4 +43,6 @@ public:
 	void removeFromMovelist();
 
 	std::array<std::array<int, 2>, 2> previousMove();
+
+	std::string hashPiece(Piece * piece);
 };

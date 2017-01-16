@@ -1,4 +1,7 @@
 #pragma once
+#ifndef BOARD_H
+#define BOARD_H
+
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include <array>
@@ -8,6 +11,7 @@
 #include "Piece.h"
 #include "Movelist.h"
 #include <fstream>
+#include <unordered_map>
 
 class Board : public sf::Drawable {
 	friend class Movelist;
@@ -36,14 +40,15 @@ class Board : public sf::Drawable {
 
 	std::array<Piece*, 64> m_squares = {};
 
-	std::array<Piece*, 16> m_blackPieces = {};
-	std::array<Piece*, 16> m_whitePieces = {};
+	std::vector<Piece*> m_blackPieces = {};
+	std::vector<Piece*> m_whitePieces = {};
 
 	std::array<int, 2> m_whiteKingPos;
 	std::array<int, 2> m_blackKingPos;
 
 	int turn = 1;
 	int m_drawCounter = 0;
+	std::vector<int> m_drawCountOnTurn;
 public:
 	//constructor(s) here?
 
@@ -87,4 +92,9 @@ public:
 	int whichTurn();
 
 	void writeMovelistToFile(std::string file);
+
+	void selectPiece(Piece *);
+
+	void boardClicked(std::array<int, 2>);
 };
+#endif
