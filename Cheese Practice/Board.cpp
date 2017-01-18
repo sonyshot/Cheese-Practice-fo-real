@@ -7,49 +7,37 @@ Board::Board() {
 	m_movelist = new Movelist(this);
 
 	for (int i = 0; i < 8; i++) {//create pawns on the board
-		m_squares[8 + i] = new Pawn(0, i, 1, 1, m_pawnTexture, this);
-		m_whitePieces[i] = m_squares[8 + i];
+		m_squares[8 + i] = new Pawn(0, i, 1, 1, &pawnTexture, this);
 
-		m_squares[48 + i] = new Pawn(0, i, 6, -1, m_pawnTexture, this);
-		m_blackPieces[i] = m_squares[48 + i];
+		m_squares[48 + i] = new Pawn(0, i, 6, -1, &pawnTexture, this);
 	};
 	for (int i = 0; i < 2; i++) {
 		//knights
-		m_squares[1 + i * 5] = new Knight(0, 1 + 5 * i, 0, 1, m_knightTexture, this);
-		m_whitePieces[8 + i] = m_squares[1 + i * 5];
+		m_squares[1 + i * 5] = new Knight(0, 1 + 5 * i, 0, 1, &knightTexture, this);
 
-		m_squares[57 + i * 5] = new Knight(0, 1 + 5 * i, 7, -1, m_knightTexture, this);
-		m_blackPieces[8 + i] = m_squares[57 + i * 5];
+		m_squares[57 + i * 5] = new Knight(0, 1 + 5 * i, 7, -1, &knightTexture, this);
 		//bishops
-		m_squares[2 + i * 3] = new Bishop(0, 2 + 3 * i, 0, 1, m_bishopTexture, this);
-		m_whitePieces[10 + i] = m_squares[2 + i * 3];
+		m_squares[2 + i * 3] = new Bishop(0, 2 + 3 * i, 0, 1, &bishopTexture, this);
 
-		m_squares[58 + i * 3] = new Bishop(0, 2 + 3 * i, 7, -1, m_bishopTexture, this);
-		m_blackPieces[10 + i] = m_squares[58 + i * 3];
+		m_squares[58 + i * 3] = new Bishop(0, 2 + 3 * i, 7, -1, &bishopTexture, this);
 		//rooks
-		m_squares[7 * i] = new Rook(0, 7 * i, 0, 1, m_rookTexture, this);
-		m_whitePieces[12 + i] = m_squares[7 * i];
+		m_squares[7 * i] = new Rook(0, 7 * i, 0, 1, &rookTexture, this);
 
-		m_squares[56 + 7 * i] = new Rook(0, 7 * i, 7, -1, m_rookTexture, this);
-		m_blackPieces[12 + i] = m_squares[56 + 7 * i];
+		m_squares[56 + 7 * i] = new Rook(0, 7 * i, 7, -1, &rookTexture, this);
 	};
 	//queens
-	m_squares[3] = new Queen(0, 3, 0, 1, m_queenTexture, this);
-	m_whitePieces[14] = m_squares[3];
+	m_squares[3] = new Queen(0, 3, 0, 1, &queenTexture, this);
 
-	m_squares[59] = new Queen(0, 3, 7, -1, m_queenTexture, this);
-	m_blackPieces[14] = m_squares[59];
+	m_squares[59] = new Queen(0, 3, 7, -1, &queenTexture, this);
 	//kings
 	m_whiteKingPos = { 4, 0 };
 	m_blackKingPos = { 4, 7 };
-	m_squares[4] = new King(0, 4, 0, 1, m_kingTexture, this);
-	m_whitePieces[15] = m_squares[4];
+	m_squares[4] = new King(0, 4, 0, 1, &kingTexture, this);
 
-	m_squares[60] = new King(0, 4, 7, -1, m_kingTexture, this);
-	m_blackPieces[15] = m_squares[60];
+	m_squares[60] = new King(0, 4, 7, -1, &kingTexture, this);
 
 	for (int i = 0; i < 32; i++) {//fill the rest of the board with empty squares
-		m_squares[16 + i] = new EmptySquare(100, i % 8, 2 + i / 8, 0, m_kingTexture, this);
+		m_squares[16 + i] = new EmptySquare(100, i % 8, 2 + i / 8, 0, &kingTexture, this);
 	};
 };
 
@@ -84,10 +72,10 @@ Board::Board(int size, Board * bufferBoard) {
 
 	for (int i = 0; i < 8; i++) {
 		//create pawns on the board
-		m_squares[8 + i] = new Pawn(100, i, 1, 1, m_pawnTexture, this);
+		m_squares[8 + i] = new Pawn(100, i, 1, 1, &pawnTexture, this);
 		m_whitePieces.push_back(m_squares[8 + i]);
 
-		m_squares[48 + i] = new Pawn(100, i, 6, -1, m_pawnTexture, this);
+		m_squares[48 + i] = new Pawn(100, i, 6, -1, &pawnTexture, this);
 		m_blackPieces.push_back(m_squares[48 + i]);
 	};
 	if (!knightTexture.loadFromFile("knight.png"))
@@ -99,22 +87,22 @@ Board::Board(int size, Board * bufferBoard) {
 
 	for (int i = 0; i < 2; i++) {
 		//knights
-		m_squares[1 + i * 5] = new Knight(100, 1 + 5 * i, 0, 1, m_knightTexture, this);
+		m_squares[1 + i * 5] = new Knight(100, 1 + 5 * i, 0, 1, &knightTexture, this);
 		m_whitePieces.push_back(m_squares[1 + i * 5]);
 
-		m_squares[57 + i * 5] = new Knight(100, 1 + 5 * i, 7, -1, m_knightTexture, this);
+		m_squares[57 + i * 5] = new Knight(100, 1 + 5 * i, 7, -1, &knightTexture, this);
 		m_blackPieces.push_back(m_squares[57 + i * 5]);
 		//bishops
-		m_squares[2 + i * 3] = new Bishop(100, 2 + 3 * i, 0, 1, m_bishopTexture, this);
+		m_squares[2 + i * 3] = new Bishop(100, 2 + 3 * i, 0, 1, &bishopTexture, this);
 		m_whitePieces.push_back(m_squares[2 + i * 3]);
 
-		m_squares[58 + i * 3] = new Bishop(100, 2 + 3 * i, 7, -1, m_bishopTexture, this);
+		m_squares[58 + i * 3] = new Bishop(100, 2 + 3 * i, 7, -1, &bishopTexture, this);
 		m_blackPieces.push_back(m_squares[58 + i * 3]);
 		//rooks
-		m_squares[7 * i] = new Rook(100, 7 * i, 0, 1, m_rookTexture, this);
+		m_squares[7 * i] = new Rook(100, 7 * i, 0, 1, &rookTexture, this);
 		m_whitePieces.push_back(m_squares[7 * i]);
 
-		m_squares[56 + 7 * i] = new Rook(100, 7 * i, 7, -1, m_rookTexture, this);
+		m_squares[56 + 7 * i] = new Rook(100, 7 * i, 7, -1, &rookTexture, this);
 		m_blackPieces.push_back(m_squares[56 + 7 * i]);
 	};
 	if (!queenTexture.loadFromFile("queen.png"))
@@ -123,22 +111,22 @@ Board::Board(int size, Board * bufferBoard) {
 		std::cout << "failed to load pawn texture" << std::endl;
 
 	//queens
-	m_squares[3] = new Queen(100, 3, 0, 1, m_queenTexture, this);
+	m_squares[3] = new Queen(100, 3, 0, 1, &queenTexture, this);
 	m_whitePieces.push_back(m_squares[3]);
 
-	m_squares[59] = new Queen(100, 3, 7, -1, m_queenTexture, this);
+	m_squares[59] = new Queen(100, 3, 7, -1, &queenTexture, this);
 	m_blackPieces.push_back(m_squares[59]);
 	//kings
 	m_whiteKingPos = { 4, 0 };
 	m_blackKingPos = { 4, 7 };
-	m_squares[4] = new King(100, 4, 0, 1, m_kingTexture, this);
+	m_squares[4] = new King(100, 4, 0, 1, &kingTexture, this);
 	m_whitePieces.push_back(m_squares[4]);
 
-	m_squares[60] = new King(100, 4, 7, -1, m_kingTexture, this);
+	m_squares[60] = new King(100, 4, 7, -1, &kingTexture, this);
 	m_blackPieces.push_back(m_squares[60]);
 
 	for (int i = 0; i < 32; i++) {//fill the rest of the board with empty squares
-		m_squares[16 + i] = new EmptySquare(100, i % 8, 2 + i / 8, 0, m_kingTexture, this);
+		m_squares[16 + i] = new EmptySquare(100, i % 8, 2 + i / 8, 0, &kingTexture, this);
 	};
 };
 
@@ -199,7 +187,7 @@ void Board::move(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	inSpace(currentPos)->move(newPos);
 	delete m_squares[newPos[0] + 8 * newPos[1]];
 	m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
-	m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
+	m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, &kingTexture, this);
 	std::cout << "Piece Moved!" << std::endl;
 
 	if (currentPos == m_whiteKingPos) {
@@ -209,10 +197,6 @@ void Board::move(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 		m_blackKingPos = newPos;
 	}
 
-}
-
-void Board::updateMoveList(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
-	
 }
 
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
@@ -230,18 +214,18 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			m_movelist->addToMovelist(currentPos, newPos);
 			m_squares[newPos[0] + 8 * newPos[1]] = ppiece;
 			ppiece->move(newPos);
-			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
+			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, &kingTexture, this);
 			if (newPos[0] > currentPos[0]) {
 				delete m_squares[newPos[0] - 1 + 8 * newPos[1]];
 				m_squares[7 + 8 * newPos[1]]->move({5, newPos[1]});
 				m_squares[newPos[0] - 1 + 8 * newPos[1]] = m_squares[newPos[0] + 1 + 8 * newPos[1]];
-				m_squares[newPos[0] + 1 + 8 * newPos[1]] = new EmptySquare(0, newPos[0] + 1, newPos[1], 0, m_kingTexture, this);
+				m_squares[newPos[0] + 1 + 8 * newPos[1]] = new EmptySquare(0, newPos[0] + 1, newPos[1], 0, &kingTexture, this);
 			}
 			else {
 				delete m_squares[3 + 8 * newPos[1]];
 				m_squares[8 * newPos[1]]->move({ 3, newPos[1] });
 				m_squares[3 + 8 * newPos[1]] = m_squares[8 * currentPos[1]];
-				m_squares[8 * currentPos[1]] = new EmptySquare(0, 0, newPos[1], 0, m_kingTexture, this);
+				m_squares[8 * currentPos[1]] = new EmptySquare(0, 0, newPos[1], 0, &kingTexture, this);
 			}
 			std::cout << "castled" << std::endl;
 
@@ -251,8 +235,9 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			m_movelist->addToMovelist(currentPos, newPos);
 			delete m_squares[currentPos[0] + 8 * currentPos[1]];
 			//always gives queens atm
-			m_squares[newPos[0] + 8 * newPos[1]] = new Queen(100, newPos[0], newPos[1], turn, m_queenTexture, this);
-			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
+			m_squares[newPos[0] + 8 * newPos[1]] = new Queen(100, newPos[0], newPos[1], turn, &queenTexture, this);
+			(turn == 1) ? m_whitePieces.push_back(m_squares[newPos[0] + 8 * newPos[1]]) : m_blackPieces.push_back(m_squares[newPos[0] + 8 * newPos[1]]);
+			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, &kingTexture, this);
 			std::cout << "pawn promoted" << std::endl;
 
 			turn = -1 * turn;
@@ -261,10 +246,10 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			//deleting piece being added to capturelist, fix it
 			m_movelist->addToMovelist(currentPos, newPos);
 			ppiece->move(newPos);
-			m_squares[newPos[0] + 8 * currentPos[1]] = new EmptySquare(0, newPos[0], currentPos[1], 0, m_kingTexture, this);
+			m_squares[newPos[0] + 8 * currentPos[1]] = new EmptySquare(0, newPos[0], currentPos[1], 0, &kingTexture, this);
 			delete m_squares[newPos[0] + 8 * newPos[1]];
 			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8*currentPos[1]];
-			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
+			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, &kingTexture, this);
 			std::cout << "en passant" << std::endl;
 
 			turn = -1 * turn;
@@ -273,7 +258,7 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 			m_movelist->addToMovelist(currentPos, newPos);
 			ppiece->move(newPos);
 			m_squares[newPos[0] + 8 * newPos[1]] = m_squares[currentPos[0] + 8 * currentPos[1]];
-			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, m_kingTexture, this);
+			m_squares[currentPos[0] + 8 * currentPos[1]] = new EmptySquare(0, currentPos[0], currentPos[1], 0, &kingTexture, this);
 			std::cout << "Piece Moved!" << std::endl;
 
 			if (currentPos == m_whiteKingPos) {
@@ -308,6 +293,8 @@ void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) 
 				if (m_movelist->m_boardStateMap[boardHash] >= 3)
 					std::cout << "Draw by repetition" << std::endl;
 			}
+			if (insufficientMaterial())
+				std::cout << "Draw by insufficient material" << std::endl;
 		}
 	}
 	else {
@@ -346,22 +333,23 @@ void Board::undoMove() {
 			delete m_squares[7 + 8 * lastMove[1][1]];
 			m_squares[5 + 8 * lastMove[1][1]]->move({7, lastMove[1][1]});
 			m_squares[7 + 8 * lastMove[1][1]] = m_squares[5 + 8 * lastMove[1][1]];
-			m_squares[5 + 8 * lastMove[1][1]] = new EmptySquare(0, 5, lastMove[1][1], 0, m_kingTexture, this);
+			m_squares[5 + 8 * lastMove[1][1]] = new EmptySquare(0, 5, lastMove[1][1], 0, &kingTexture, this);
 		}
 		else {
 			delete m_squares[8 * lastMove[1][1]];
 			m_squares[3 + 8 * lastMove[1][1]]->move({ 0, lastMove[1][1] });
 			m_squares[8 * lastMove[1][1]] = m_squares[3 + 8 * lastMove[1][1]];
-			m_squares[3 + 8 * lastMove[1][1]] = new EmptySquare(0, 3, lastMove[1][1], 0, m_kingTexture, this);
+			m_squares[3 + 8 * lastMove[1][1]] = new EmptySquare(0, 3, lastMove[1][1], 0, &kingTexture, this);
 		}
 	}
 	else if (m_movelist->m_moveType.back() == 2) {//promotion
 		m_squares[lastMove[1][0] + 8 * lastMove[1][1]] = m_movelist->m_captureList.back();
 		delete m_squares[lastMove[0][0] + 8 * lastMove[0][1]];
-		m_squares[lastMove[0][0] + 8 * lastMove[0][1]] = new Pawn(100, lastMove[0][0], lastMove[0][1], -1*turn, m_pawnTexture, this);
+		(turn == 1) ? m_blackPieces.pop_back() : m_whitePieces.pop_back();
+		m_squares[lastMove[0][0] + 8 * lastMove[0][1]] = new Pawn(100, lastMove[0][0], lastMove[0][1], -1*turn, &pawnTexture, this);
 	}
 	else {//en passant
-		m_squares[lastMove[1][0] + 8 * lastMove[1][1]] = new EmptySquare(0, lastMove[1][0], lastMove[1][1], 0, m_kingTexture, this);
+		m_squares[lastMove[1][0] + 8 * lastMove[1][1]] = new EmptySquare(0, lastMove[1][0], lastMove[1][1], 0, &kingTexture, this);
 		delete m_squares[lastMove[1][0] + 8 * lastMove[0][1]];
 		m_squares[lastMove[1][0] + 8 * lastMove[0][1]] = m_movelist->m_captureList.back();
 	}
@@ -607,10 +595,6 @@ std::array<std::array<int, 2>, 2> Board::previousMove() {
 	return m_movelist->previousMove();
 }
 
-int Board::whichTurn() {
-	return turn;
-}
-
 void Board::writeMovelistToFile(std::string filename) {
 	std::ofstream file(filename, std::ofstream::app);
 	if (file.is_open())
@@ -619,8 +603,76 @@ void Board::writeMovelistToFile(std::string filename) {
 	file.close();
 }
 
-void Board::selectPiece(Piece * ppiece) {
-	
+bool Board::insufficientMaterial() {
+	Piece * currentPiece = NULL;
+	bool lightB = 0;
+	bool darkB = 0;
+	bool isKnight = 0;
+	for (int i = 0; i < m_whitePieces.size(); i++) {
+		currentPiece = m_whitePieces[i];
+		if (currentPiece->isCaptured() || currentPiece->getName() == "K") 
+			continue;
+
+		if (currentPiece->getName() != "B" && currentPiece->getName() != "N")
+			return false;
+
+		if (currentPiece->getName() == "B") {
+			if ((currentPiece->getPosition()[0] + currentPiece->getPosition()[1]) % 2 == 0) {
+				if (darkB || isKnight)
+					return false;
+				
+				if (!lightB)
+					lightB = 1;
+
+				continue;
+			}
+			else {
+				if (lightB || isKnight)
+					return false;
+
+				if (!darkB)
+					darkB = 1;
+				
+				continue;
+			}
+		}
+		else {
+			if (lightB || darkB || isKnight)
+				return false;
+
+			isKnight = 1;
+		}
+	}
+	for (int i = 0; i < m_blackPieces.size(); i++) {
+		currentPiece = m_blackPieces[i];
+		if (currentPiece->isCaptured() || currentPiece->getName() == "K")
+			continue;
+
+		if (currentPiece->getName() != "B" && currentPiece->getName() != "N")
+			return false;
+
+		if (currentPiece->getName() == "B") {
+			if ((currentPiece->getPosition()[0] + currentPiece->getPosition()[1]) % 2 == 0) {
+				if (darkB || isKnight)
+					return false;
+
+				continue;
+			}
+			else {
+				if (lightB || isKnight)
+					return false;
+
+				continue;
+			}
+		}
+		else {
+			if (lightB || darkB || isKnight)
+				return false;
+
+			isKnight = 1;
+		}
+	}
+	return true;
 }
 
 void Board::boardClicked(std::array<int, 2> square) {

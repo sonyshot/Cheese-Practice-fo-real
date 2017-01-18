@@ -172,7 +172,7 @@ Things to implement
 - turns *DONE*
 - drawing the objects (should Board handle that and draw all of the pieces too?) *DONE*
 - checkmate checker *DONE*
-- stalemate checker /in progress/ (currently working on 50 moves sans capture *DONE* and insufficient checkmating material)
+- stalemate checker *DONE* (currently working on 50 moves sans capture *DONE* and insufficient checkmating material *DONE*)
 - seeing movelist *DONE*
 - undo button *DONE* (functions exactly right, UI for it isnt implemented)
 -- will need special considerations for special moves

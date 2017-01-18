@@ -1,4 +1,7 @@
 #pragma once
+#ifndef PIECE_H
+#define PIECE_H
+
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include <array>
@@ -57,3 +60,4 @@ public:
 	bool operator==(const Piece& piece) const;
 };
 
+#endif // !PIECE_H

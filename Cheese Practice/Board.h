@@ -29,13 +29,6 @@ class Board : public sf::Drawable {
 	sf::Texture queenTexture;
 	sf::Texture kingTexture;
 
-	sf::Texture * m_pawnTexture = &pawnTexture;
-	sf::Texture * m_knightTexture = &knightTexture;
-	sf::Texture * m_bishopTexture = &bishopTexture;
-	sf::Texture * m_rookTexture = &rookTexture;
-	sf::Texture * m_queenTexture = &queenTexture;
-	sf::Texture * m_kingTexture = &kingTexture;
-
 	sf::Sprite m_sprite;
 
 	std::array<Piece*, 64> m_squares = {};
@@ -75,8 +68,6 @@ public:
 
 	void move(std::array<int, 2> currentPos, std::array<int, 2> newPos);
 
-	void updateMoveList(std::array<int, 2> currentPos, std::array<int, 2> newPos);
-
 	void validMove(std::array<int, 2> currentPos, std::array<int, 2> newPos);
 	
 	void undoMove();
@@ -89,12 +80,10 @@ public:
 
 	std::array<std::array<int, 2>, 2> previousMove();
 
-	int whichTurn();
-
 	void writeMovelistToFile(std::string file);
 
-	void selectPiece(Piece *);
-
 	void boardClicked(std::array<int, 2>);
+
+	bool insufficientMaterial();
 };
 #endif

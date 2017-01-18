@@ -1,4 +1,7 @@
 #pragma once
+#ifndef REAL_PIECES_H
+#define REAL_PIECES_H
+
 #include "Piece.h"
 
 class Pawn : public Piece{
@@ -116,3 +119,4 @@ public:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	//see above
 };
+#endif // !PIECE_H

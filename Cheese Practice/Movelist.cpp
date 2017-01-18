@@ -236,12 +236,18 @@ std::string Movelist::hashBoard() {
 
 std::string Movelist::hashPiece(Piece * piece) {
 	std::string output;
+	//each component of hash starts with piece 'name'
 	if (piece->getName() == "") {
 		output.append("P");
 	}
 	else {
 		output.append(piece->getName());
 	}
+	//add the piece color
+	if (piece->getName() != "S")
+		output.append(std::to_string(piece->getColor()));
+
+	// extra character for pieces with special moves
 	if (piece->getName() == "") {
 		if (piece->canEnPassant({ piece->getPosition()[0] - 1, piece->getPosition()[1] + piece->getColor() })) {
 			output.append("1"); //en passant left available
@@ -266,9 +272,6 @@ std::string Movelist::hashPiece(Piece * piece) {
 			output.append("2"); //castle left
 		else
 			output.append("0"); //can't castle
-	}
-	else {
-		output.append("0");
 	}
 	return output;
 }

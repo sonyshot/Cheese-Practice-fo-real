@@ -1,4 +1,7 @@
 #pragma once
+#ifndef MOVELIST_H
+#define MOVELIST_H
+
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include <array>
@@ -46,3 +49,4 @@ public:
 
 	std::string hashPiece(Piece * piece);
 };
+#endif // !MOVELIST_H
