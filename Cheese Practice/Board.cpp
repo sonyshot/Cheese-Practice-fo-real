@@ -678,3 +678,9 @@ bool Board::insufficientMaterial() {
 void Board::boardClicked(std::array<int, 2> square) {
 
 }
+
+void Board::flipBoard() {
+	for (int i = 0; i < 64; i++) {
+		m_squares[i]->flipBoard();
+	}
+}

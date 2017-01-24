@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 #include "board.h"
 #include "Piece.h"
 #include "real pieces.h"
@@ -11,8 +12,12 @@
 
 int main()
 {
+	float fps = 60.f;
+	sf::Time sleepTime(sf::seconds(1.f/fps));
+	sf::Clock clock;
+
 	int windowState = 1;
-	sf::RenderWindow window(sf::VideoMode(1000, 800), "board drawing test");
+	sf::RenderWindow window(sf::VideoMode(1000, 1000), "board drawing test");
 	int boardCreated = 0;
 
 	Board bBuffer;
@@ -33,6 +38,8 @@ int main()
 		//testing menu screen, etc.
 		while (windowState == 0) {
 			//game loop
+			std::cout << clock.restart().asSeconds() << std::endl;
+
 			sf::Event event;
 			while (window.pollEvent(event))
 			{
@@ -69,8 +76,10 @@ int main()
 						board.undoMove();
 						std::cout << "move undone" << std::endl;
 					}
-					else
+					else {
+						board.flipBoard();
 						flippedBoard = !flippedBoard;
+					}
 					break;
 					/*
 					*****This is the original click once to pick a piece and click again to move it to a square*****
@@ -139,9 +148,14 @@ int main()
 			window.clear();
 			window.draw(board);
 			window.display();
+			if (clock.getElapsedTime() < sleepTime)
+				sf::sleep(sleepTime - clock.getElapsedTime());
+
 		}
 		while (windowState == 1) {
 			//starting menu loop
+			std::cout << clock.restart().asSeconds() << std::endl;
+
 			sf::Event event;
 			while (window.pollEvent(event)) {
 				switch (event.type) {
@@ -159,6 +173,8 @@ int main()
 			window.clear();
 			window.draw(rectangle);
 			window.display();
+			if (clock.getElapsedTime() < sleepTime)
+				sf::sleep(sleepTime - clock.getElapsedTime());
 		}
 	};
 
@@ -177,12 +193,14 @@ Things to implement
 - undo button *DONE* (functions exactly right, UI for it isnt implemented)
 -- will need special considerations for special moves
 - *this* inside class functions is apparently unneccessary, clean it up! *DONE*
-- add 'flipped board' functionality, probably best to convert input and output than to make adjustments in base code to account for it
+- add 'flipped board' functionality, probably best to convert input and output than to make adjustments in base code to account for it *DONE* (doing a band-aid solution,
+	eventually would like pieces to not store their own position and have the board handle where to draw them)
 - have the legal moves of selected piece be highlighted
 - generalize piece/board sizes to allow for scaling of the board
-- add sleep/timer for a 60 fps update loop
+- add sleep/timer for a 60 fps update loop *DONE* (i think)
 - logging to txt file(s)
 
+---might be possible to remove emptySquares and replace them with NULL on the board
 ---Using vector.reserve()
 ---setting dangling pointers to NULL after deleting their objects
 */

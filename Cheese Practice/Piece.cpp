@@ -31,14 +31,24 @@ Piece::Piece(int size, int file, int rank, int color, sf::Texture * texture, Boa
 	if (color == -1) {
 		m_sprite.setColor(sf::Color::Black);
 	}
-	m_sprite.setPosition(sf::Vector2f((float)(file * size), (float)(7-rank) * size));
+	if (m_isFlipped) {
+		m_sprite.setPosition(sf::Vector2f((float)(file * size), (float)(rank) * size));
+	}
+	else {
+		m_sprite.setPosition(sf::Vector2f((float)(file * size), (float)(7 - rank) * size));
+	}
 	m_currentBoard = board;
 	m_name = identifier;
 };
 
 void Piece::move(std::array<int, 2> newPos) {
 	m_position.swap(newPos);
-	m_sprite.setPosition(sf::Vector2f(m_position[0]*m_size, (7-m_position[1])*m_size));
+	if (m_isFlipped) {
+		m_sprite.setPosition(sf::Vector2f(m_position[0] * m_size, (m_position[1])*m_size));
+	}
+	else {
+		m_sprite.setPosition(sf::Vector2f(m_position[0] * m_size, (7 - m_position[1])*m_size));
+	}
 };
 void Piece::dragPiece(std::array<int, 2> movement) {
 	m_sprite.setPosition(sf::Vector2f((float)movement[0], (float)movement[1]));
@@ -84,6 +94,16 @@ void Piece::setCapture(bool capture) {
 bool Piece::isCaptured() {
 	return m_isCaptured;
 };
+
+void Piece::flipBoard() {
+	m_isFlipped = !m_isFlipped;
+	if (m_isFlipped) {
+		m_sprite.setPosition(sf::Vector2f(m_position[0] * m_size, (m_position[1])*m_size));
+	}
+	else {
+		m_sprite.setPosition(sf::Vector2f(m_position[0] * m_size, (7 - m_position[1])*m_size));
+	}
+}
 
 bool Piece::operator==(const Piece& piece) const {
 	if (m_position == piece.m_position && m_color == piece.m_color && m_name == piece.m_name && m_isCaptured == piece.m_isCaptured)

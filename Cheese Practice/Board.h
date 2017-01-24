@@ -38,11 +38,12 @@ class Board : public sf::Drawable {
 
 	std::array<int, 2> m_whiteKingPos;
 	std::array<int, 2> m_blackKingPos;
-
-	int turn = 1;
+	
 	int m_drawCounter = 0;
 	std::vector<int> m_drawCountOnTurn;
 public:
+	
+	int turn = 1;
 	//constructor(s) here?
 
 	Board();
@@ -85,5 +86,7 @@ public:
 	void boardClicked(std::array<int, 2>);
 
 	bool insufficientMaterial();
+
+	void flipBoard();
 };
 #endif

@@ -18,6 +18,7 @@ protected:
 	Board * m_currentBoard;
 	std::string m_name;
 	bool m_isCaptured = 0;
+	bool m_isFlipped = 0;
 public:
 	Piece();
 
@@ -52,6 +53,8 @@ public:
 	void incrementMoves();
 
 	void decrementMoves();
+
+	void flipBoard();
 
 	virtual bool legalMove(std::array<int, 2> move, Board * bufferBoard) = 0;
 
