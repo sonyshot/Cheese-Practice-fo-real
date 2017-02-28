@@ -63,4 +63,6 @@ public:
 	bool operator==(const Piece& piece) const;
 };
 
+enum class ChessMoves {NORMAL, CASTLE, PROMOTION, ENPASSANT};
+
 #endif // !PIECE_H

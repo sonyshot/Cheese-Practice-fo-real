@@ -54,37 +54,41 @@ std::string Movelist::squareName(std::array<int, 2> square) {
 	return output;
 };
 
-std::string Movelist::newSquareNotation(std::array<int, 2> square, int specialMove) {
+std::string Movelist::newSquareNotation(std::array<int, 2> square, ChessMoves specialMove) {
 	std::string output;
-	if (!specialMove) {
+	switch (specialMove) {
+
+	case ChessMoves::NORMAL:
 		output.append(squareName(square));
 		return output;
-	}
-	else if (specialMove == 1) {
+		break;
+
+	case ChessMoves::CASTLE:
 		//castle
-		if (square[0] == 6) {
+		if (square[0] == 6)
 			output.append("0-0");
-			return output;
-		}
-		else {
+		else
 			output.append("0-0-0");
-			return output;
-		}
-	}
-	else if (specialMove == 2) {
+
+		return output;
+		break;
+
+	case ChessMoves::PROMOTION:
 		//promotion
 		output.append("=Q");
 		return output;
-	}
-	else {
+		break;
+
+	case ChessMoves::ENPASSANT:
 		//en passant
 		output.append(squareName(square));
 		output.append(" e.p.");
 		return output;
+		break;
 	}
 }
 
-std::string Movelist::printableString(std::array<std::array<int, 2>, 2> move, Piece* piece, int specialMove) {
+std::string Movelist::printableString(std::array<std::array<int, 2>, 2> move, Piece* piece, ChessMoves specialMove) {
 	std::string output;
 
 	if (piece->getColor() == 1)
@@ -92,8 +96,9 @@ std::string Movelist::printableString(std::array<std::array<int, 2>, 2> move, Pi
 	else
 		output = "-";
 
-	if (!specialMove) {
+	switch(specialMove) {
 
+	case ChessMoves::NORMAL:
 		if ((m_board->inSpace(move[1])->getColor() == 0) ? 0 : 1) {
 			if (piece->getName() == "")
 				output.append(squareName(move[0]).substr(0, 1));
@@ -107,27 +112,31 @@ std::string Movelist::printableString(std::array<std::array<int, 2>, 2> move, Pi
 		}
 		output.append(newSquareNotation(move[1], specialMove));
 		return output;
-	}
-	else if (specialMove == 1) {
+		break;
+
+	case ChessMoves::CASTLE: 
 		//castle--------------------------------------------------------------
 		output.append(newSquareNotation(move[1], specialMove));
 		return output;
-	}
-	else if (specialMove == 2) {
+		break;
+
+	case ChessMoves::PROMOTION:
 		//promotion------------------------------------------------------------
 		if ((m_board->inSpace(move[1])->getColor() == 0) ? 0 : 1)
 			output.append(squareName(move[0]).substr(0, 1) + "x");
 
 		output.append(newSquareNotation(move[1], specialMove));
 		return output;
-	}
-	else if (specialMove == 3) {
+		break;
+
+	case ChessMoves::ENPASSANT:
 		//en passant-----------------------------------------------------------
 		output.append(squareName(move[0]).substr(0, 1));
 		output.append("x");
 		output.append(newSquareNotation(move[1], specialMove));
 
 		return output;
+		break;
 	}
 }
 
@@ -140,32 +149,32 @@ void Movelist::addToMovelist(std::array<int, 2> currentPos, std::array<int, 2> n
 
 		m_captureList.push_back(m_board->inSpace(newPos)); //put captured piece into list
 		m_captureList.back()->setCapture(1);
-		m_moveType.push_back(1);
-		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 1)));
+		m_moveType.push_back(ChessMoves::CASTLE);
+		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), ChessMoves::CASTLE)));
 	}
 	else if (m_board->inSpace(currentPos)->canPromote(newPos)) {
 		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
 
 		m_captureList.push_back(m_board->inSpace(newPos)); 
 		m_captureList.back()->setCapture(1);
-		m_moveType.push_back(2);
-		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 2)));
+		m_moveType.push_back(ChessMoves::PROMOTION);
+		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), ChessMoves::PROMOTION)));
 	}
 	else if (m_board->inSpace(currentPos)->canEnPassant(newPos)) {
 		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
 
 		m_captureList.push_back(m_board->inSpace({ newPos[0], currentPos[1] })); 
 		m_captureList.back()->setCapture(1);
-		m_moveType.push_back(3);
-		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 3)));
+		m_moveType.push_back(ChessMoves::ENPASSANT);
+		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), ChessMoves::ENPASSANT)));
 	}
 	else {
 		m_movelist.push_back({ currentPos, newPos }); //add from-to positions to movelist
 
 		m_captureList.push_back(m_board->inSpace(newPos)); 
 		m_captureList.back()->setCapture(1);
-		m_moveType.push_back(0);
-		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), 0)));
+		m_moveType.push_back(ChessMoves::NORMAL);
+		m_text.setString(m_printMoves.append(printableString({ currentPos, newPos }, m_board->inSpace(currentPos), ChessMoves::NORMAL)));
 	}
 }
 
@@ -174,11 +183,11 @@ void Movelist::removeFromMovelist() {
 	//this function simply removes the last entry of each stored list and corrects the movelist text accordingly
 
 	//0-normal move; 1-castling; 2-promotion; 3-en passant
-	if (m_moveType.back() == 0) {
+	if (m_moveType.back() == ChessMoves::NORMAL) {
 		std::size_t found = m_printMoves.find_last_of("-\n");
 		m_printMoves.erase(found, m_printMoves.length() - found);
 	}
-	else if (m_moveType.back() == 1) {
+	else if (m_moveType.back() == ChessMoves::CASTLE) {
 		if (m_movelist.back()[1][0] == 6) {
 			//kingside castling
 			m_printMoves.erase(m_printMoves.length() - 4, 4);
@@ -190,11 +199,11 @@ void Movelist::removeFromMovelist() {
 		}
 
 	}
-	else if (m_moveType.back() == 2) {
+	else if (m_moveType.back() == ChessMoves::PROMOTION) {
 		std::size_t found = m_printMoves.find_last_of("-\n");
 		m_printMoves.erase(found, m_printMoves.length() - found);
 	}
-	else {
+	else if(m_moveType.back() == ChessMoves::ENPASSANT) {
 		std::size_t found = m_printMoves.find_last_of("-\n");
 		m_printMoves.erase(found, m_printMoves.length() - found);
 	}

@@ -168,7 +168,6 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	};
 	target.draw(*m_movelist, states);
 };
-//see above
 
 //note this can't be used with buffer boards
 std::vector<Piece*> Board::inCheckCheck() {
@@ -323,10 +322,10 @@ void Board::undoMove() {
 	m_squares[lastMove[1][0] + 8 * lastMove[1][1]]->move(lastMove[0]); //change piece position to its old one
 	m_squares[lastMove[0][0] + 8 * lastMove[0][1]] = m_squares[lastMove[1][0] + 8 * lastMove[1][1]]; //move the pieces pointer back to the old square
 
-	if (m_movelist->m_moveType.back() == 0) {// normal move
+	if (m_movelist->m_moveType.back() == ChessMoves::NORMAL) {// normal move
 		m_squares[lastMove[1][0] + 8 * lastMove[1][1]] = m_movelist->m_captureList.back();
 	}
-	else if (m_movelist->m_moveType.back() == 1) {//castling
+	else if (m_movelist->m_moveType.back() == ChessMoves::CASTLE) {//castling
 		m_squares[lastMove[1][0] + 8 * lastMove[1][1]] = m_movelist->m_captureList.back();
 
 		if (lastMove[1][0] == 6) {
@@ -342,7 +341,7 @@ void Board::undoMove() {
 			m_squares[3 + 8 * lastMove[1][1]] = new EmptySquare(0, 3, lastMove[1][1], 0, &kingTexture, this);
 		}
 	}
-	else if (m_movelist->m_moveType.back() == 2) {//promotion
+	else if (m_movelist->m_moveType.back() == ChessMoves::PROMOTION) {//promotion
 		m_squares[lastMove[1][0] + 8 * lastMove[1][1]] = m_movelist->m_captureList.back();
 		delete m_squares[lastMove[0][0] + 8 * lastMove[0][1]];
 		(turn == 1) ? m_blackPieces.pop_back() : m_whitePieces.pop_back();

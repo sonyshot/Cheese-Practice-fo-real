@@ -16,7 +16,7 @@ class Movelist :public sf::Drawable {
 
 	std::vector<std::array<std::array<int, 2>, 2>> m_movelist;
 	std::vector<Piece*> m_captureList;
-	std::vector<int> m_moveType;
+	std::vector<ChessMoves> m_moveType;
 	Board * m_board;
 	
 	std::string m_printMoves = "Movelist:";
@@ -25,9 +25,9 @@ class Movelist :public sf::Drawable {
 
 	std::string squareName(std::array<int, 2> square);
 
-	std::string newSquareNotation(std::array<int, 2> square, int specialMove);
+	std::string newSquareNotation(std::array<int, 2> square, ChessMoves specialMove);
 
-	std::string printableString(std::array<std::array<int, 2>, 2> square, Piece * piece, int specialMove);
+	std::string printableString(std::array<std::array<int, 2>, 2> square, Piece * piece, ChessMoves specialMove);
 
 	std::unordered_map<std::string, int> m_boardStateMap;
 

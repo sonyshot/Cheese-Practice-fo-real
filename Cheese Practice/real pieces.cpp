@@ -128,11 +128,9 @@ std::vector<std::array<int, 2>> Knight::listLegalMoves(Board * bufferBoard) {
 	return output;
 }
 
-	//this needs to be redone/actually done
 void Knight::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 };
-	//see above
 
 //BISHOP-----------------------------------------------------------------------------
 Bishop::Bishop(int size, int file, int rank, int color, sf::Texture * texture, Board * board) :Piece(size, file, rank, color, texture, board, "B") {
@@ -212,11 +210,9 @@ std::vector<std::array<int, 2>> Bishop::listLegalMoves(Board * bufferBoard) {
 	return output;
 }
 
-	//this needs to be redone/actually done
 void Bishop::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 };
-//see above
 
 //ROOK------------------------------------------------------------------------------------
 Rook::Rook(int size, int file, int rank, int color, sf::Texture * texture, Board * board) :Piece(size, file, rank, color, texture, board, "R") {
@@ -309,11 +305,9 @@ std::vector<std::array<int, 2>> Rook::listLegalMoves(Board * bufferBoard) {
 	return output;
 }
 
-	//this needs to be redone/actually done
 void Rook::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 };
-	//see above
 
 //QUEEN----------------------------------------------------------------------------------------
 Queen::Queen(int size, int file, int rank, int color, sf::Texture * texture, Board * board) :Piece(size, file, rank, color, texture, board, "Q") {
@@ -452,11 +446,9 @@ std::vector<std::array<int, 2>> Queen::listLegalMoves(Board * bufferBoard) {
 	return output;
 }
 
-	//this needs to be redone/actually done
 void Queen::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 };
-	//see above
 
 //KING--------------------------------------------------------------------------------------
 King::King(int size, int file, int rank, int color, sf::Texture * texture, Board * board) :Piece(size, file, rank, color, texture, board, "K") {
@@ -505,7 +497,6 @@ std::vector<std::array<int, 2>> King::listLegalMoves(Board * bufferBoard) {
 	return output;
 }
 
-	//this needs to be redone/actually done
 void King::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 };
@@ -540,7 +531,6 @@ bool King::canCastle(std::array<int, 2> move) {
 	else
 		return false;
 };
-	//see above
 
 //EMPTY-----------------------------------------------------------------
 EmptySquare::EmptySquare() {
@@ -569,8 +559,7 @@ std::vector<std::array<int, 2>> EmptySquare::listLegalMoves(Board * bufferBoard)
 	return output;
 }
 
-	//this needs to be redone/actually done
 void EmptySquare::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 };
-	//see above
+	
