@@ -10,6 +10,7 @@
 #include "Button.h"
 
 class AppContext :public sf::Drawable {
+	std::vector<Button*> m_buttons;
 	
 public:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
