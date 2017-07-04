@@ -2,11 +2,11 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-#include <SFML\Graphics.hpp>
-#include <iostream>
-#include <array>
-
 class Board;
+
+#include <array>
+#include <string>
+#include <SFML\Graphics.hpp>
 
 class Piece: public sf::Drawable {
 protected:
@@ -14,11 +14,13 @@ protected:
 	int m_color;
 	int m_numMoves = 0;
 	sf::Sprite m_sprite;
+	sf::CircleShape m_highlightCircle;
 	float m_size;
 	Board * m_currentBoard;
 	std::string m_name;
 	bool m_isCaptured = 0;
 	bool m_isFlipped = 0;
+	bool m_isHovered = 0;
 public:
 	Piece();
 
@@ -55,6 +57,8 @@ public:
 	void decrementMoves();
 
 	void flipBoard();
+
+	void hoverPiece();
 
 	virtual bool legalMove(std::array<int, 2> move, Board * bufferBoard) = 0;
 

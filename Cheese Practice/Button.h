@@ -7,6 +7,9 @@
 #include <iostream>
 #include <functional>
 
+class AppContext;
+
+enum class ContextEnum {GAMECONTEXT, MENUCONTEXT, LOADINGCONTEXT};
 
 class Button :public sf::Drawable {
 	//currently this will assume a rectangular shaped button

@@ -7,6 +7,10 @@
 
 class ContextSwitch :public Button {
 
+public:
+	ContextSwitch();
+
+	AppContext * swap(AppContext * oldContext, ContextEnum newContext);
 };
 
 class SettingEdit :public Button {

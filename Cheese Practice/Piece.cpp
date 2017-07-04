@@ -39,6 +39,9 @@ Piece::Piece(int size, int file, int rank, int color, sf::Texture * texture, Boa
 	}
 	m_currentBoard = board;
 	m_name = identifier;
+
+	m_highlightCircle.setRadius(50);
+	m_highlightCircle.setFillColor(sf::Color::Blue);
 };
 
 void Piece::move(std::array<int, 2> newPos) {
@@ -110,4 +113,9 @@ bool Piece::operator==(const Piece& piece) const {
 		return true;
 	else
 		return false;
+}
+
+void Piece::hoverPiece() {
+	m_isHovered = !m_isHovered;
+	m_highlightCircle.setPosition(m_sprite.getPosition());
 }

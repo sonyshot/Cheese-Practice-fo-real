@@ -2,25 +2,32 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include <SFML\Graphics.hpp>
-#include <iostream>
-#include <array>
+class Movelist;
+
 #include <string>
 #include <math.h>
 #include <algorithm>
-#include "Piece.h"
-#include "Movelist.h"
 #include <fstream>
-#include <unordered_map>
+#include "Piece.h"
+#include "StateManager.h"
 
-class Board : public sf::Drawable {
+class Board : public ApplicationState {
 	friend class Movelist;
+
+	int m_xPos, m_yPos, m_size;
 
 	Board * m_buffer;
 
 	Movelist * m_movelist;
 
+	Piece * m_heldPiece = NULL;
+
 	sf::Texture m_boardTexture;
+	sf::Texture m_MMbuttonTexture;
+	sf::Texture m_RestartButtonTexture;
+
+	sf::Sprite m_RestartButtonSprite;
+	sf::Sprite m_MMbuttonSprite;
 
 	sf::Texture pawnTexture;
 	sf::Texture knightTexture;
@@ -44,20 +51,19 @@ class Board : public sf::Drawable {
 public:
 	
 	int turn = 1;
-	//constructor(s) here?
 
 	Board();
 	//this uses 'new' to create piece objects that wont get deleted outside the constructor necessitating 'delete' in the destructor
-	Board(int size, Board * bufferBoard);
+	Board(int size, StateManager * stateManager);
+	//add statemanager pointer to constructor
 	//plz use multiple of 8 for board creation
 
 	Board(int size, std::array<Piece*, 64> squares, std::array<int, 2> whiteKingPos, std::array<int, 2> blackKingPos);
 	//need destructor defined to clear out objects on heap
 	~Board();
 
-	//this needs to be redone/actually done
+	//this needs to be redone/actually done; although this seems to work
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	//see above
 
 	std::vector<Piece*> inCheckCheck();
 
@@ -83,10 +89,10 @@ public:
 
 	void writeMovelistToFile(std::string file);
 
-	void boardClicked(std::array<int, 2>);
-
 	bool insufficientMaterial();
 
 	void flipBoard();
+
+	void handleEvent(const sf::Event &eventHandled);
 };
 #endif

@@ -1,6 +1,7 @@
 
 #include "Board.h"
 #include "real pieces.h"
+#include "Movelist.h"
 
 //buffer board constructor
 Board::Board() {
@@ -41,9 +42,11 @@ Board::Board() {
 	};
 };
 
-Board::Board(int size, Board * bufferBoard) {
+Board::Board(int size, StateManager * stateManager) {
 	//size should be a multiple of 8, not sure how it will draw otherwise
-	m_buffer = bufferBoard;
+	m_buffer = new Board();
+
+	m_stateManager = stateManager;
 
 	m_movelist = new Movelist(this);
 
@@ -64,7 +67,11 @@ Board::Board(int size, Board * bufferBoard) {
 				m_boardTexture.update(blackSquare, i*size / 8, j*size / 8);
 		};
 	};
-
+	
+	//eventually here you should be able to create the board anywhere on the window, not just the top left
+	m_xPos = 0;
+	m_yPos = 0;
+	m_size = size;
 	m_sprite.setTexture(m_boardTexture);
 
 	if (!pawnTexture.loadFromFile("pawn.png"))
@@ -109,6 +116,17 @@ Board::Board(int size, Board * bufferBoard) {
 		std::cout << "failed to load pawn texture" << std::endl;
 	if (!kingTexture.loadFromFile("king.png"))
 		std::cout << "failed to load pawn texture" << std::endl;
+
+	if (!m_MMbuttonTexture.loadFromFile("mainMenuButton.png"))
+		std::cout << "failed to load button texture" << std::endl;
+
+	if (!m_RestartButtonTexture.loadFromFile("restartbutton.png"))
+		std::cout << "failed to load restart texture" << std::endl;
+
+	m_RestartButtonSprite.setTexture(m_RestartButtonTexture);
+	m_RestartButtonSprite.setPosition(sf::Vector2f(200.f, 800.f));
+	m_MMbuttonSprite.setTexture(m_MMbuttonTexture);
+	m_MMbuttonSprite.setPosition(sf::Vector2f(0.f, 800.f));
 
 	//queens
 	m_squares[3] = new Queen(100, 3, 0, 1, &queenTexture, this);
@@ -159,6 +177,9 @@ Board::~Board() {
 		delete m_squares[i];
 	};
 	delete m_movelist;
+	if (m_buffer) {
+		delete m_buffer;
+	};
 };
 
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -167,6 +188,8 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		target.draw(*m_squares[i], states);
 	};
 	target.draw(*m_movelist, states);
+	target.draw(m_MMbuttonSprite, states);
+	target.draw(m_RestartButtonSprite, states);
 };
 
 //note this can't be used with buffer boards
@@ -182,6 +205,7 @@ std::vector<Piece*> Board::inCheckCheck() {
 	return output;
 };
 
+//moves piece without checking legality
 void Board::move(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	inSpace(currentPos)->move(newPos);
 	delete m_squares[newPos[0] + 8 * newPos[1]];
@@ -198,6 +222,7 @@ void Board::move(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 
 }
 
+//checks legality before moving piece
 void Board::movePiece(std::array<int, 2> currentPos, std::array<int, 2> newPos) {
 	Piece * ppiece = inSpace(currentPos);
 	if ((!(inSpace(newPos)->getColor())) || !(ppiece->getName() == "")) {
@@ -674,12 +699,52 @@ bool Board::insufficientMaterial() {
 	return true;
 }
 
-void Board::boardClicked(std::array<int, 2> square) {
-
-}
-
 void Board::flipBoard() {
 	for (int i = 0; i < 64; i++) {
 		m_squares[i]->flipBoard();
+	}
+}
+
+//don't forget to change the conditionals to be related to variables instead of arbitrary numbers
+//this only cares about release location to choose event, should take click and release into account
+void Board::handleEvent(const sf::Event &e) {
+	switch (e.type) {
+
+	case sf::Event::MouseButtonPressed:
+		if (e.mouseButton.x - m_xPos < m_size && e.mouseButton.y - m_yPos < m_size) {
+			m_heldPiece = inSpace({ (e.mouseButton.x - m_xPos) / 100, 7 - (e.mouseButton.y - m_yPos) / 100 });
+		}
+		else {
+		}
+		break;
+
+	case sf::Event::MouseButtonReleased:
+		if (e.mouseButton.x - m_xPos < m_size && e.mouseButton.y - m_yPos < m_size) {
+			std::array<int, 2> movedFrom = m_heldPiece->getPosition();
+			std::array<int, 2> movedTo = { (e.mouseButton.x - m_xPos) / 100 , 7 - (e.mouseButton.y - m_yPos) / 100 };
+			if (m_heldPiece->legalMove(movedTo, m_buffer)) {
+				movePiece(movedFrom,movedTo);
+				m_buffer->movePiece(movedFrom, movedTo);
+				m_heldPiece->incrementMoves();
+			}
+		}
+		else if(e.mouseButton.x - m_xPos < 200 && e.mouseButton.y - m_yPos < 1000) {
+			m_stateManager->switchState(PossibleStates::MENUSTATE1);
+		}
+		else if (e.mouseButton.x - m_xPos < 400 && e.mouseButton.y - m_yPos < 1000) {
+			m_stateManager->restartChess();
+		}
+		break;
+
+	case sf::Event::MouseMoved:
+		if (e.mouseMove.x - m_xPos < m_size && e.mouseMove.y - m_yPos < m_size) {
+			//do something
+		}
+		else {
+		}
+		break;
+
+	default:
+		break;
 	}
 }

@@ -2,13 +2,7 @@
 #ifndef MOVELIST_H
 #define MOVELIST_H
 
-#include <SFML\Graphics.hpp>
-#include <iostream>
-#include <array>
-#include <string>
-#include <math.h>
 #include <unordered_map>
-#include "Piece.h"
 #include "Board.h"
 
 class Movelist :public sf::Drawable {

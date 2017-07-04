@@ -48,6 +48,9 @@ bool Pawn::legalMove(std::array<int, 2> move, Board * bufferBoard) {
 
 void Pawn::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
+	if (m_isHovered) {
+		target.draw(m_highlightCircle, states);
+	}
 };
 
 bool Pawn::canPromote(std::array<int, 2> move) {
